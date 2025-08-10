@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}Blog & Galerie – Vianu Biologists{% endblock %}
+{% block content %}
+<h2>POSTĂRI</h2>
+
+<div class="filters">
+  <button onclick="filterSection('all')">Toate</button>
+  <button onclick="filterSection('insta')">INSTA</button>
+  <button onclick="filterSection('articles')">ARTICOLE</button>
+  <button onclick="filterSection('gallery')">GALERIE</button>
+  <input id="searchInput" placeholder="Caută după titlu..." onkeyup="searchCards()">
+</div>
+
+<div id="posts">
+  {% for p in posts %}
+  <article class="post-card" data-section="{{p.section}}" data-title="{{p.title|lower}}">
+    <h3>{{ p.title }}</h3>
+    <small><b>Autor:</b> {{ p.author }} |
+           <b>Data:</b> {{ p.created_at.strftime('%Y-%m-%d') }} |
+           <b>Secțiune:</b> {{ p.section }}</small>
+    {% if p.image_url %}<img src="{{ p.image_url }}" class="gallery-img" alt="cover">{% endif %}
+    {% if p.content %}<p>{{ p.content }}</p>{% endif %}
+    {% if p.external_url %}<p><a href="{{ p.external_url }}" target="_blank">Vezi link</a></p>{% endif %}
+  </article>
+  {% endfor %}
+</div>
+
+<script>
+function filterSection(sec){
+  document.querySelectorAll('.post-card').forEach(c=>{
+    c.style.display = (sec==='all' || c.dataset.section===sec) ? 'block' : 'none';
+  });
+}
+function searchCards(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.post-card').forEach(c=>{
+    c.style.display = c.dataset.title.includes(q) ? 'block' : 'none';
+  });
+}
+</script>
+{% endblock %}
