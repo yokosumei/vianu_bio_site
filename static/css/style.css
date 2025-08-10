@@ -1,0 +1,50 @@
+:root { --green:#28a745; --ink:#1a4d1a; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: 'Segoe UI', system-ui, sans-serif; background:#f4f4f4; color:#222; }
+
+.container { display:flex; min-height:100vh; }
+.sidebar { width:180px; background:#fff; border-right:1px solid #ccc; padding:30px 0; position:sticky; top:0; height:100vh; }
+.sidebar nav { display:flex; flex-direction:column; gap:16px; padding-left:20px; }
+.sidebar a { text-decoration:none; color:var(--green); font-weight:700; }
+
+.main-content { flex:1; padding:30px; overflow-y:auto; }
+footer { margin-top:40px; padding:16px; text-align:center; background:#222; color:#fff; border-radius:12px; }
+
+.flash-wrap { margin-bottom:16px; }
+.flash { padding:10px 12px; border-radius:8px; }
+.flash.error { background:#ffe8e8; border:1px solid #e99; }
+
+h1,h2 { color:var(--ink); }
+
+/* Home grid + ADN background + hovers */
+.home-grid { display:grid; grid-template-columns: 1.2fr 1fr; gap:32px; align-items:center; }
+.dna-canvas {
+  position:relative; width:100%; aspect-ratio:3/4;
+  background-image:url("../images/dna.svg");
+  background-repeat:no-repeat; background-position:center; background-size:contain;
+  border-radius:12px; min-height:420px; background-color:#fff;
+}
+.bridge{ position:absolute; left:48%; width:14%; height:6%;
+  background:rgba(0,255,0,0.25); border:1px dashed rgba(0,0,0,0.15);
+  transform:skew(-12deg); transition:transform .15s ease, background .15s ease; }
+.bridge:nth-child(1){ top:22%; }
+.bridge:nth-child(2){ top:48%; }
+.bridge:nth-child(3){ top:74%; }
+.bridge:hover{ background:rgba(0,255,0,0.4); transform:skew(-12deg) scale(1.03); }
+
+.info-panel { background:#fff; border-left:6px solid var(--green); padding:24px; border-radius:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+
+/* Blog cards */
+.filters { display:flex; gap:10px; align-items:center; margin:14px 0 20px; }
+.filters input { flex:1; padding:10px; border:1px solid #ccc; border-radius:8px; }
+button { border:none; background:var(--green); color:#fff; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700; }
+button:hover { opacity:.9; }
+
+.post-card { background:#fff; border-left:5px solid var(--green); padding:16px; border-radius:10px; margin-bottom:16px; }
+.post-card small { display:block; margin:8px 0; color:#666; }
+.gallery-img { max-width:100%; border-radius:8px; margin-top:8px; }
+
+/* Forms */
+.form-box { display:flex; flex-direction:column; gap:10px; background:#fff; padding:16px; border-radius:10px; border-left:5px solid var(--green); }
+.form-box input, .form-box textarea, .form-box select { padding:10px; border:1px solid #ccc; border-radius:8px; }
