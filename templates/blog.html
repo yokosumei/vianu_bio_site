@@ -1,4 +1,3 @@
-<html>
 {% extends "layout.html" %}
 {% block title %}Blog & Galerie – Vianu Biologists{% endblock %}
 
@@ -6,12 +5,12 @@
 <section class="blog-wrapper">
   <!-- SIDEBAR ADN -->
   <aside class="blog-sidebar">
-    <button class="nav-btn insta" onclick="filterContent('insta')">INSTA</button>
+    <button class="nav-btn insta"   onclick="filterContent('insta')">INSTA</button>
     <button class="nav-btn article" onclick="filterContent('articles')">ARTICOLE</button>
     <div class="nav-deco"></div>
     <div class="nav-deco"></div>
     <button class="nav-btn gallery" onclick="filterContent('gallery')">GALERIE</button>
-    <button class="nav-btn home" onclick="window.location.href='/'">HOME</button>
+    <button class="nav-btn home"    onclick="window.location.href='/'">HOME</button>
   </aside>
 
   <!-- CONȚINUT PRINCIPAL -->
@@ -23,156 +22,74 @@
       <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu...">
     </div>
 
-    <!-- POSTĂRI -->
-    <div class="post-item" data-section="insta" data-title="O zi în viața unui bondar urban">
-      <h3>Insta:bees</h3>
-      <small><strong>Autor:</strong> @vianubio | <strong>Data:</strong> 2023-06-01 | <strong>Secțiune:</strong> Insta</small>
-      <p>🐝</p>
-    </div>
+    <!-- POSTĂRI DIN DB -->
+    {% for p in posts %}
+      <div class="post-item"
+           data-section="{{ p.section }}"
+           data-title="{{ (p.title or '')|lower }}">
+        <h3>
+          {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% else %}Articol:{% endif %}
+          {{ p.title }}
+        </h3>
 
-    <div class="post-item" data-section="articles" data-title="Copacii orașului – Plămânii noștri verzi">
-      <h3>Articol:trees</h3>
-      <small><strong>Autor:</strong> Andrei T. | <strong>Data:</strong> 2023-05-28 | <strong>Secțiune:</strong> Articol</small>
-      <p>trees.</p>
-    </div>
+        <small>
+          <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
+          | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') if p.created_at else '' }}
+          | <strong>Secțiune:</strong>
+          {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% else %}Articol{% endif %}
+        </small>
 
-    <div class="post-item" data-section="gallery" data-title="Ziua plantării">
-      <h3>Galerie:S-AU DUS LA UNIV DE BIO!!</h3>
-      <small><strong>Autor:</strong> Club BIO | <strong>Data:</strong> 2023-05-26 | <strong>Secțiune:</strong> Galerie</small>
-      <img src="{{ url_for('static', filename='images/photo1.jpg') }}" class="gallery-img" alt="cool kids :)">
-    </div>
+        {% if p.image_url %}
+          <img src="{{ p.image_url }}" class="gallery-img" alt="cover">
+        {% endif %}
 
-    <div class="post-item" data-section="articles" data-title="Biodiversitatea din grădini">
-      <h3>Articol:Ma mananca tantarii :(</h3>
-      <small><strong>Autor:</strong> Maria I. | <strong>Data:</strong> 2023-05-20 | <strong>Secțiune:</strong> Articol</small>
-      <p>Not cool tantari.</p>
-    </div>
+        {% if p.content %}
+          <p>{{ p.content }}</p>
+        {% endif %}
 
-    <div class="post-item" data-section="insta" data-title="Grauri pe acoperiș">
-      <h3>Insta:Me like birds :))</h3>
-      <small><strong>Autor:</strong> @vianubio | <strong>Data:</strong> 2023-05-18 | <strong>Secțiune:</strong> Insta</small>
-      <p>BIRDS!</p>
-    </div>
+        {% if p.external_url %}
+          <p><a href="{{ p.external_url }}" target="_blank" rel="noopener">Vezi link</a></p>
+        {% endif %}
+      </div>
+    {% else %}
+      <p>Nu există postări încă. Adaugă din <a href="{{ url_for('admin_new') }}">admin</a>.</p>
+    {% endfor %}
   </div>
 </section>
-{% endblock %}
-</html>
+
 <style>
-.blog-wrapper {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-}
-
-.blog-sidebar {
-  width: 180px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding-left: 10px;
-}
-
-.nav-btn {
-  padding: 15px;
-  font-weight: bold;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transform: skew(-15deg);
-  font-size: 16px;
-  transition: background 0.2s ease;
-}
-
-.nav-btn:hover {
-  opacity: 0.9;
-}
-
-.nav-btn.insta {
-  background-color: #1da1f2;
-}
-
-.nav-btn.article {
-  background-color: #e63946;
-}
-
-.nav-btn.gallery {
-  background-color: #1da1f2;
-}
-
-.nav-btn.home {
-  background-color: #e63946;
-}
-
-.nav-deco {
-  height: 40px;
-  background-color: #ccc;
-  transform: skew(-15deg);
-  opacity: 0.2;
-}
-
-.blog-main {
-  flex: 1;
-}
-
-.search-bar {
-  margin-bottom: 20px;
-}
-
-#searchInput {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.post-item {
-  background-color: #fff;
-  border-left: 5px solid #28a745;
-  margin-bottom: 20px;
-  padding: 15px;
-  border-radius: 6px;
-}
-
-.post-item small {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 13px;
-  color: #666;
-}
-
-.gallery-img {
-  max-width: 100%;
-  border-radius: 6px;
-  margin-top: 10px;
-}
-
+.blog-wrapper { display:flex; gap:30px; margin-top:30px; }
+.blog-sidebar { width:180px; display:flex; flex-direction:column; gap:15px; padding-left:10px; }
+.nav-btn { padding:15px; font-weight:700; border:none; color:#fff; cursor:pointer; transform:skew(-15deg); font-size:16px; transition:background .2s ease; }
+.nav-btn:hover { opacity:.9; }
+.nav-btn.insta { background:#1da1f2; }
+.nav-btn.article { background:#e63946; }
+.nav-btn.gallery { background:#1da1f2; }
+.nav-btn.home { background:#e63946; }
+.nav-deco { height:40px; background:#ccc; transform:skew(-15deg); opacity:.2; }
+.blog-main { flex:1; }
+.search-bar { margin-bottom:20px; }
+#searchInput { width:100%; padding:10px; font-size:16px; border-radius:6px; border:1px solid #ccc; }
+.post-item { background:#fff; border-left:5px solid #28a745; margin-bottom:20px; padding:15px; border-radius:6px; }
+.post-item small { display:block; margin-bottom:10px; font-size:13px; color:#666; }
+.gallery-img { max-width:100%; border-radius:6px; margin-top:10px; }
 </style>
+
 <script>
 function filterContent(section) {
   const allPosts = document.querySelectorAll('.post-item');
   allPosts.forEach(post => {
     const postSection = post.getAttribute('data-section');
-    if (section === 'all' || postSection === section) {
-      post.style.display = 'block';
-    } else {
-      post.style.display = 'none';
-    }
+    post.style.display = (section === 'all' || postSection === section) ? 'block' : 'none';
   });
 }
-
 function searchPosts() {
-  const input = document.getElementById("searchInput").value.toLowerCase();
+  const input = (document.getElementById("searchInput").value || "").toLowerCase();
   const posts = document.querySelectorAll(".post-item");
-
   posts.forEach(post => {
-    const title = post.getAttribute("data-title").toLowerCase();
-    if (title.includes(input)) {
-      post.style.display = "block";
-    } else {
-      post.style.display = "none";
-    }
+    const title = (post.getAttribute("data-title") || "").toLowerCase();
+    post.style.display = title.includes(input) ? "block" : "none";
   });
 }
-
 </script>
+{% endblock %}
