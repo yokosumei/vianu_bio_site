@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Nouă postare – Vianu Biologists{% endblock %}
+{% block content %}
+<h2>Adaugă postare</h2>
+<form method="post" enctype="multipart/form-data" class="form-box">
+  <label>Secțiune</label>
+  <select name="section">
+    <option value="articles">Articol</option>
+    <option value="insta">Insta</option>
+    <option value="gallery">Galerie</option>
+  </select>
+
+  <label>Titlu</label>
+  <input name="title" required>
+
+  <label>Conținut (opțional)</label>
+  <textarea name="content" rows="5"></textarea>
+
+  <label>Imagine (opțional)</label>
+  <input name="image" type="file" accept="image/*">
+
+  <label>Link extern (ex: Instagram, opțional)</label>
+  <input name="external_url" type="url" placeholder="https://...">
+
+  <button type="submit">Publică</button>
+</form>
+{% endblock %}
