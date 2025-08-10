@@ -1,41 +1,178 @@
+<html>
 {% extends "layout.html" %}
 {% block title %}Blog & Galerie – Vianu Biologists{% endblock %}
+
 {% block content %}
-<h2>POSTĂRI</h2>
+<section class="blog-wrapper">
+  <!-- SIDEBAR ADN -->
+  <aside class="blog-sidebar">
+    <button class="nav-btn insta" onclick="filterContent('insta')">INSTA</button>
+    <button class="nav-btn article" onclick="filterContent('articles')">ARTICOLE</button>
+    <div class="nav-deco"></div>
+    <div class="nav-deco"></div>
+    <button class="nav-btn gallery" onclick="filterContent('gallery')">GALERIE</button>
+    <button class="nav-btn home" onclick="window.location.href='/'">HOME</button>
+  </aside>
 
-<div class="filters">
-  <button onclick="filterSection('all')">Toate</button>
-  <button onclick="filterSection('insta')">INSTA</button>
-  <button onclick="filterSection('articles')">ARTICOLE</button>
-  <button onclick="filterSection('gallery')">GALERIE</button>
-  <input id="searchInput" placeholder="Caută după titlu..." onkeyup="searchCards()">
-</div>
+  <!-- CONȚINUT PRINCIPAL -->
+  <div class="blog-main">
+    <h2>---------------------------POSTARI!-----------------------</h2>
 
-<div id="posts">
-  {% for p in posts %}
-  <article class="post-card" data-section="{{p.section}}" data-title="{{p.title|lower}}">
-    <h3>{{ p.title }}</h3>
-    <small><b>Autor:</b> {{ p.author }} |
-           <b>Data:</b> {{ p.created_at.strftime('%Y-%m-%d') }} |
-           <b>Secțiune:</b> {{ p.section }}</small>
-    {% if p.image_url %}<img src="{{ p.image_url }}" class="gallery-img" alt="cover">{% endif %}
-    {% if p.content %}<p>{{ p.content }}</p>{% endif %}
-    {% if p.external_url %}<p><a href="{{ p.external_url }}" target="_blank">Vezi link</a></p>{% endif %}
-  </article>
-  {% endfor %}
-</div>
+    <!-- CĂUTARE TITLU -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu...">
+    </div>
 
-<script>
-function filterSection(sec){
-  document.querySelectorAll('.post-card').forEach(c=>{
-    c.style.display = (sec==='all' || c.dataset.section===sec) ? 'block' : 'none';
-  });
-}
-function searchCards(){
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  document.querySelectorAll('.post-card').forEach(c=>{
-    c.style.display = c.dataset.title.includes(q) ? 'block' : 'none';
-  });
-}
-</script>
+    <!-- POSTĂRI -->
+    <div class="post-item" data-section="insta" data-title="O zi în viața unui bondar urban">
+      <h3>Insta:bees</h3>
+      <small><strong>Autor:</strong> @vianubio | <strong>Data:</strong> 2023-06-01 | <strong>Secțiune:</strong> Insta</small>
+      <p>🐝</p>
+    </div>
+
+    <div class="post-item" data-section="articles" data-title="Copacii orașului – Plămânii noștri verzi">
+      <h3>Articol:trees</h3>
+      <small><strong>Autor:</strong> Andrei T. | <strong>Data:</strong> 2023-05-28 | <strong>Secțiune:</strong> Articol</small>
+      <p>trees.</p>
+    </div>
+
+    <div class="post-item" data-section="gallery" data-title="Ziua plantării">
+      <h3>Galerie:S-AU DUS LA UNIV DE BIO!!</h3>
+      <small><strong>Autor:</strong> Club BIO | <strong>Data:</strong> 2023-05-26 | <strong>Secțiune:</strong> Galerie</small>
+      <img src="{{ url_for('static', filename='images/photo1.jpg') }}" class="gallery-img" alt="cool kids :)">
+    </div>
+
+    <div class="post-item" data-section="articles" data-title="Biodiversitatea din grădini">
+      <h3>Articol:Ma mananca tantarii :(</h3>
+      <small><strong>Autor:</strong> Maria I. | <strong>Data:</strong> 2023-05-20 | <strong>Secțiune:</strong> Articol</small>
+      <p>Not cool tantari.</p>
+    </div>
+
+    <div class="post-item" data-section="insta" data-title="Grauri pe acoperiș">
+      <h3>Insta:Me like birds :))</h3>
+      <small><strong>Autor:</strong> @vianubio | <strong>Data:</strong> 2023-05-18 | <strong>Secțiune:</strong> Insta</small>
+      <p>BIRDS!</p>
+    </div>
+  </div>
+</section>
 {% endblock %}
+</html>
+<style>
+.blog-wrapper {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.blog-sidebar {
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-left: 10px;
+}
+
+.nav-btn {
+  padding: 15px;
+  font-weight: bold;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transform: skew(-15deg);
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+.nav-btn:hover {
+  opacity: 0.9;
+}
+
+.nav-btn.insta {
+  background-color: #1da1f2;
+}
+
+.nav-btn.article {
+  background-color: #e63946;
+}
+
+.nav-btn.gallery {
+  background-color: #1da1f2;
+}
+
+.nav-btn.home {
+  background-color: #e63946;
+}
+
+.nav-deco {
+  height: 40px;
+  background-color: #ccc;
+  transform: skew(-15deg);
+  opacity: 0.2;
+}
+
+.blog-main {
+  flex: 1;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.post-item {
+  background-color: #fff;
+  border-left: 5px solid #28a745;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.post-item small {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.gallery-img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+</style>
+<script>
+function filterContent(section) {
+  const allPosts = document.querySelectorAll('.post-item');
+  allPosts.forEach(post => {
+    const postSection = post.getAttribute('data-section');
+    if (section === 'all' || postSection === section) {
+      post.style.display = 'block';
+    } else {
+      post.style.display = 'none';
+    }
+  });
+}
+
+function searchPosts() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const posts = document.querySelectorAll(".post-item");
+
+  posts.forEach(post => {
+    const title = post.getAttribute("data-title").toLowerCase();
+    if (title.includes(input)) {
+      post.style.display = "block";
+    } else {
+      post.style.display = "none";
+    }
+  });
+}
+
+</script>
