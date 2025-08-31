@@ -44,18 +44,17 @@
                data-title="{{ (p.title or '')|lower }}">
 
         <header class="post-head">
-          <h3 class="post-title">
-            {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% elif p.section == 'lectii' %}Lecție:{% else %}Articol:{% endif %}
-            {{ p.title }}
-          </h3>
-          <small class="meta">
-            <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
-            {% if p.created_at %} | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') }}{% endif %}
-            | <strong>Secțiune:</strong>
-            {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
-          </small>
-        </header>
-
+  <h3 class="post-title">
+    {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% elif p.section == 'lectii' %}Lecție:{% else %}Articol:{% endif %}
+    {{ p.title }}
+  </h3>
+  <small class="meta">
+    <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
+    {% if p.created_at %} | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') }}{% endif %}
+    | <strong>Secțiune:</strong>
+    {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
+  </small>
+</header>
         {% if p.image_url %}
           <img src="{{ p.image_url }}" class="gallery-img" alt="cover">
         {% endif %}
