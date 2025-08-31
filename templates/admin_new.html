@@ -3,12 +3,16 @@
 {% block content %}
 <h2>Adaugă postare</h2>
 <form method="post" enctype="multipart/form-data" class="form-box">
-  <label>Secțiune</label>
-  <select name="section">
-    <option value="articles">Articol</option>
-    <option value="insta">Insta</option>
-    <option value="gallery">Galerie</option>
-  </select>
+ <label for="section">Secțiune</label>
+<select id="section" name="section" required>
+  <option value="insta">Insta</option>
+  <option value="articles">Articol</option>
+  <option value="gallery">Galerie</option>
+  {% if can_view_lessons %}
+    <option value="lectii">Lecții (privat)</option>
+  {% endif %}
+</select>
+
 
   <label>Titlu</label>
   <input name="title" required>
