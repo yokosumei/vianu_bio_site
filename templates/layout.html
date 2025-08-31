@@ -11,16 +11,21 @@
   <div class="container">
     <aside class="sidebar">
       <nav>
-        <a href="{{ url_for('index') }}">Acasă</a>
-        <a href="{{ url_for('blog') }}">Blog</a>
-        <a href="{{ url_for('blog') }}">Galerie</a>
-        {% if session.get('logged_in') %}
-          <a href="{{ url_for('admin_new') }}">+ Post</a>
-          <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-          <a href="{{ url_for('login_page') }}">Login</a>
-        {% endif %}
-      </nav>
+  <a href="{{ url_for('index') }}">Acasă</a>
+  <a href="{{ url_for('blog') }}">Blog</a>
+  <a href="{{ url_for('blog') }}#galerie">Galerie</a>
+
+  {% if session.get('user_id') in ['admin@vianubio','membriiaccount'] %}
+    <a href="{{ url_for('lectii') }}">Lecții</a>
+  {% endif %}
+
+  {% if session.get('user_id') %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
     </aside>
 
     <main class="main-content">
