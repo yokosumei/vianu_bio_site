@@ -11,10 +11,7 @@
             fill="none" stroke="#2e7d32" stroke-width="4"/>
       <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
             fill="none" stroke="#1565c0" stroke-width="4"/>
-      <!-- benzi -->
-      <rect x="10" y="70"  width="40" height="26" rx="4" fill="#43a047"/>
-      <rect x="10" y="230" width="40" height="26" rx="4" fill="#1976d2"/>
-      <rect x="10" y="390" width="40" height="26" rx="4" fill="#e53935"/>
+      <!-- am scos casetele colorate -->
     </svg>
 
     <!-- overlay peste ADN: ALBASTRU / ROȘU / ROȘU / ALBASTRU -->
@@ -26,7 +23,6 @@
     </nav>
 
     {% if can_view_lessons %}
-    <!-- Lecții separat, sub overlay (ca să păstrăm schema cerută) -->
     <nav class="blog-dna-nav-secondary">
       <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
     </nav>
@@ -37,12 +33,10 @@
   <div class="blog-content">
     <h2 class="posts-title">POSTĂRI</h2>
 
-    <!-- Căutare după titlu -->
     <div class="search-bar">
       <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu...">
     </div>
 
-    <!-- Lista postărilor -->
     {% for p in posts %}
       <article class="post-item"
                id="{{ p.section }}"
@@ -74,8 +68,6 @@
           {% if p.external_url %}
             <a class="btn ghost" target="_blank" rel="noopener" href="{{ p.external_url }}">Link extern</a>
           {% endif %}
-
-          {# DOAR pentru 'lectii': buton spre prezentare dacă există link #}
           {% if p.section == 'lectii' and p.ppt_url %}
             <a class="btn" target="_blank" rel="noopener" href="{{ p.ppt_url }}">Deschide prezentarea</a>
           {% endif %}
@@ -87,7 +79,6 @@
   </div>
 </section>
 
-<!-- STILURI specifice blogului -->
 <style>
 /* Layout general */
 .blog-wrap{
@@ -102,7 +93,7 @@
   position: sticky;
   top: 16px;
   align-self: start;
-  display: block;          /* container simplu pentru overlay */
+  display: block;
   min-height: 520px;
 }
 .dna-slim{
@@ -115,30 +106,27 @@
   filter: drop-shadow(0 4px 12px rgba(0,0,0,.1));
 }
 
-/* Overlay-ul cu butoane, peste ADN */
+/* Overlay cu butoane, peste ADN */
 .blog-dna-nav{
   position: absolute;
-  top: 14%;                /* ajustează dacă vrei mai sus/jos */
+  top: 14%;
   left: 50%;
   transform: translateX(-50%);
-  width: 220px;            /* lățimea stivei de butoane */
+  width: 230px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 22px;               /* distanță mai mare între butoane */
   z-index: 2;
-  pointer-events: auto;
 }
-
-/* Lecții – separat sub overlay (opțional) */
 .blog-dna-nav-secondary{
-  margin-top: 12px;
+  margin-top: 18px;
   display: flex;
   justify-content: center;
 }
 
 /* Butoane */
 .pill{
-  display:block; text-align:center; padding:12px 14px; border-radius:16px;
+  display:block; text-align:center; padding:12px 16px; border-radius:16px;
   font-weight:800; color:#fff; text-decoration:none;
   box-shadow:0 6px 16px rgba(0,0,0,.12)
 }
@@ -179,20 +167,17 @@
     position: static;
     transform: none;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap:10px;
+    gap: 16px;            /* distanță confortabilă și pe mobil */
     margin-top: 10px;
   }
-  .blog-dna-nav-secondary{
-    justify-content:center;
-  }
+  .blog-dna-nav-secondary{ justify-content:center }
 }
 </style>
 
-<!-- Script filtrare/căutare -->
 <script>
 function filterContent(section) {
   const allPosts = document.querySelectorAll('.post-item');
