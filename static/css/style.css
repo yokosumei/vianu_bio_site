@@ -110,3 +110,38 @@ button:hover { opacity:.9; }
   .box-blog{ grid-column:1; grid-row:4 }
   .dna-box{ max-width:560px }
 }
+/* ===== BLOG/GALERIE: layout cu ADN lateral ===== */
+.blog-wrap{
+  display:grid;
+  grid-template-columns: 240px 1fr;
+  gap:24px;
+}
+
+.blog-dna{
+  position:sticky;
+  top:16px;
+  align-self:start;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.dna-slim{ width:100%; height:auto; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,.1)) }
+
+.blog-dna-nav{ display:flex; flex-direction:column; gap:12px }
+.pill{
+  display:block; text-align:center; padding:10px 12px; border-radius:14px;
+  font-weight:800; color:#fff; text-decoration:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.1)
+}
+.pill-blue{ background:#1e88e5 }
+.pill-red{ background:#e53935 }
+
+.blog-content{ min-width:0 } /* ca să nu se rupă layoutul */
+
+@media (max-width: 980px){
+  .blog-wrap{ grid-template-columns:1fr }
+  .blog-dna{ position:static; flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap }
+  .dna-slim{ width:180px }
+  .blog-dna-nav{ flex-direction:row; flex-wrap:wrap; gap:10px; justify-content:center }
+}
+
