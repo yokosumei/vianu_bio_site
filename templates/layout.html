@@ -13,6 +13,7 @@
    <nav>
     <a href="{{ url_for('index') }}">Acasă</a>
     <a href="{{ url_for('blog') }}">Blog</a>
+    <a href="{{ url_for('about') }}">Despre noi</a>
     <a href="{{ url_for('blog') }}#galerie">Galerie</a>
   
     {% if session.get('user_email') in ['admin@vianubio','membriiaccount'] %}
