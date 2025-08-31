@@ -33,28 +33,39 @@
   <div class="blog-content">
     <h2 class="posts-title">POSTĂRI</h2>
 
+    <!-- Căutare după titlu -->
     <div class="search-bar">
       <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu...">
     </div>
 
+    <!-- Lista postărilor -->
     {% for p in posts %}
       <article class="post-item"
-               id="{{ p.section }}"
+               id="{{ p.section }}{{ p.id }}"
                data-section="{{ p.section }}"
                data-title="{{ (p.title or '')|lower }}">
 
         <header class="post-head">
-  <h3 class="post-title">
-    {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% elif p.section == 'lectii' %}Lecție:{% else %}Articol:{% endif %}
-    {{ p.title }}
-  </h3>
-  <small class="meta">
-    <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
-    {% if p.created_at %} | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') }}{% endif %}
-    | <strong>Secțiune:</strong>
-    {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
-  </small>
-</header>
+          <h3 class="post-title">
+            {% if p.section == 'insta' %}
+              Insta:
+            {% elif p.section == 'gallery' %}
+              Galerie:
+            {% elif p.section == 'lectii' %}
+              Lectie:
+            {% else %}
+              Articol:
+            {% endif %}
+            {{ p.title }}
+          </h3>
+          <small class="meta">
+            <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
+            {% if p.created_at %} | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') }}{% endif %}
+            | <strong>Secțiune:</strong>
+            {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
+          </small>
+        </header>
+
         {% if p.image_url %}
           <img src="{{ p.image_url }}" class="gallery-img" alt="cover">
         {% endif %}
@@ -63,30 +74,34 @@
           <p class="post-body">{{ p.content }}</p>
         {% endif %}
 
-      <div class="post-actions">
-        {# EXTERNAL_URL: dacă e PDF -> „Descarcă PDF” + „Vezi în browser”; altfel Link extern #}
-        {% if p.external_url %}
-          {% set link = p.external_url %}
-          {% if link and (link|lower).endswith('.pdf') %}
-            <a class="btn btn-download" href="{{ link }}" download>Descarcă PDF</a>
-            <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Vezi în browser</a>
-          {% else %}
-            <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Link extern</a>
+        <div class="post-actions">
+          {# EXTERNAL_URL: dacă e PDF -> “Descarcă PDF” + “Vezi în browser”; altfel Link extern #}
+          {% if p.external_url %}
+            {% set link = p.external_url %}
+            {% if link and (link|lower).endswith('.pdf') %}
+              <a class="btn btn-download" href="{{ link }}" download>Descarcă PDF</a>
+              <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Vezi în browser</a>
+            {% else %}
+              <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Link extern</a>
+            {% endif %}
           {% endif %}
-        {% endif %}
-      
-        {# LECȚII: dacă ppt_url e PDF -> „Descarcă PDF” + „Vezi în browser”; altfel „Deschide prezentarea” #}
-        {% if p.section == 'lectii' and p.ppt_url %}
-          {% set link2 = p.ppt_url %}
-          {% if link2 and (link2|lower).endswith('.pdf') %}
-            <a class="btn btn-download" href="{{ link2 }}" download>Descarcă PDF</a>
-            <a class="btn ghost" href="{{ link2 }}" target="_blank" rel="noopener">Vezi în browser</a>
-          {% else %}
-            <a class="btn" href="{{ link2 }}" target="_blank" rel="noopener">Deschide prezentarea</a>
-          {% endif %}
-        {% endif %}
-      </div>
 
+          {# LECȚII: dacă ppt_url e PDF -> download; altfel „Deschide prezentarea” #}
+          {% if p.section == 'lectii' and p.ppt_url %}
+            {% set link2 = p.ppt_url %}
+            {% if link2 and (link2|lower).endswith('.pdf') %}
+              <a class="btn btn-download" href="{{ link2 }}" download>Descarcă PDF</a>
+              <a class="btn ghost" href="{{ link2 }}" target="_blank" rel="noopener">Vezi în browser</a>
+            {% else %}
+              <a class="btn" href="{{ link2 }}" target="_blank" rel="noopener">Deschide prezentarea</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </article>
+    {% else %}
+      <p>Nu există postări încă. Adaugă din <a href="{{ url_for('admin_new') }}">admin</a>.</p>
+    {% endfor %}
+  </div>
 </section>
 
 <style>
@@ -167,6 +182,7 @@
 .btn{ display:inline-block; padding:10px 14px; border-radius:10px; background:#2f8f4f; color:#fff; text-decoration:none; font-weight:800 }
 .btn:hover{ opacity:.92 }
 .btn.ghost{ background:transparent; color:#2f8f4f; border:2px solid #2f8f4f }
+.btn-download::after{ content:" ⤓"; font-weight:900; }
 
 /* Responsive */
 @media (max-width: 980px){
@@ -181,7 +197,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px;            /* distanță confortabilă și pe mobil */
+    gap: 16px;
     margin-top: 10px;
   }
   .blog-dna-nav-secondary{ justify-content:center }
