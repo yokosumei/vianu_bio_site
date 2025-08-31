@@ -10,12 +10,11 @@
       {% for m in team %}
       <figure class="member">
         <img
-  src="{{ url_for('static',
-        filename=(m.photo if '/' in (m.photo or '')
-                  else 'images/' ~ (m.photo or 'placeholder.jpg'))) }}"
-  alt="{{ m.name }}"
-  loading="lazy">
-
+          src="{{ url_for('static',
+                filename=(m.photo if '/' in (m.photo or '')
+                          else 'images/' ~ (m.photo or 'placeholder.jpg'))) }}"
+          alt="{{ m.name }}"
+          loading="lazy">
         <figcaption>{{ m.name }}</figcaption>
       </figure>
       {% endfor %}
@@ -31,26 +30,38 @@
   text-align:center; margin:0 0 18px; letter-spacing:1px; color:#114411;
   border-top:3px dashed #1b5e20; padding-top:12px;
 }
+
+/* grilă mai aerisită pentru imagini mai mari */
 .team-grid{
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
   align-items:start;
 }
+
 .member{
-  display:flex; flex-direction:column; align-items:center; gap:10px;
+  display:flex; flex-direction:column; align-items:center; gap:12px;
   padding:14px; background:#fff; border-radius:14px;
   box-shadow: 0 6px 20px rgba(0,0,0,.06);
 }
+
+/* IMAGINE PĂTRATĂ, MĂRITĂ */
 .member img{
-  width:130px; height:130px; object-fit:cover; border-radius:999px;
+  width: 190px;
+  height: 190px;
+  object-fit: cover;        /* umple pătratul, taie surplusul */
+  border-radius: 0;         /* pătrat, fără colțuri rotunjite */
   box-shadow: 0 6px 16px rgba(0,0,0,.10);
+  display:block;
 }
+
 .member figcaption{
   font-weight:800; text-align:center;
 }
+
 @media (max-width: 600px){
-  .member img{ width:110px; height:110px; }
+  .team-grid{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .member img{ width:150px; height:150px; }
 }
 </style>
 {% endblock %}
