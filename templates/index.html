@@ -6,27 +6,27 @@
 
   <header class="hp-header">
     <h1>Vianu Biologists</h1>
-    <p>Biologie × Robotică × AI</p>
+    {# am scos subtitlul "Biologie × Robotică × AI" #}
   </header>
 
   <section class="dna-layout">
 
     <!-- dreapta sus -->
-    <article class="dna-box box-about">
+    <article class="dna-box box-about" id="box-about">
       <h2>CINE SUNTEM?</h2>
       <p>Despre club, valori, proiecte.</p>
       <a class="btn" href="{{ url_for('about') }}">Vezi echipa</a>
     </article>
 
     <!-- stânga mijloc -->
-    <article class="dna-box box-gallery">
+    <article class="dna-box box-gallery" id="box-gallery">
       <h2>GALERIE</h2>
       <p>Proiecte & evenimente.</p>
       <a class="btn ghost" href="{{ url_for('blog') }}#galerie">Deschide</a>
     </article>
 
     <!-- dreapta jos -->
-    <article class="dna-box box-blog">
+    <article class="dna-box box-blog" id="box-blog">
       <h2>BLOG</h2>
       <p>Ultimele noutăți.</p>
       <a class="btn" href="{{ url_for('blog') }}">Citește</a>
@@ -46,10 +46,10 @@
               fill="none" stroke="#2e7d32" stroke-width="6"/>
         <path d="M130,20 C 180,120 20,180 70,260 C 120,340 80,420 130,500 C 160,550 160,580 130,590"
               fill="none" stroke="#1565c0" stroke-width="6"/>
-        <!-- benzi color (sus/mid/jos) -->
-        <rect x="60" y="80"  width="80" height="40" rx="6" fill="#43a047" opacity="0.25"/>
-        <rect x="60" y="280" width="80" height="40" rx="6" fill="#1976d2" opacity="0.25"/>
-        <rect x="60" y="480" width="80" height="40" rx="6" fill="#e53935" opacity="0.25"/>
+        <!-- benzi color (sus/mijloc/jos) — au ID-uri, pentru hover -->
+        <rect id="seg-top"    x="60" y="80"  width="80" height="40" rx="6" fill="#43a047" opacity="0.25"/>
+        <rect id="seg-mid"    x="60" y="280" width="80" height="40" rx="6" fill="#1976d2" opacity="0.25"/>
+        <rect id="seg-bottom" x="60" y="480" width="80" height="40" rx="6" fill="#e53935" opacity="0.25"/>
       </svg>
     </div>
 
@@ -59,4 +59,60 @@
     <p>Contact: <a href="mailto:vianubiologists@example.com">vianubiologists@example.com</a></p>
   </footer>
 </div>
+
+<!-- ===== CSS local: casetele apar doar la hover ===== -->
+<style>
+  /* ascunse implicit */
+  .dna-box{
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .18s ease, transform .18s ease, box-shadow .18s ease;
+    pointer-events: none; /* nu blochează hover-ul pe ADN când sunt invizibile */
+  }
+  /* vizibile când sunt "active" (hover pe bandă sau pe casetă) */
+  .dna-box.active{
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    box-shadow: 0 10px 28px rgba(0,0,0,.12);
+  }
+  /* mic feedback de hover pe benzi */
+  #seg-top,#seg-mid,#seg-bottom{ cursor: pointer; transition: opacity .12s ease }
+  #seg-top:hover,#seg-mid:hover,#seg-bottom:hover{ opacity: .45 }
+</style>
+
+<!-- ===== JS local: leagă benzile de casetele corespunzătoare ===== -->
+<script>
+(function(){
+  const pairs = {
+    "seg-top": "box-about",     // verde -> CINE SUNTEM?
+    "seg-mid": "box-gallery",   // albastru -> GALERIE
+    "seg-bottom": "box-blog"    // roșu -> BLOG
+  };
+
+  const boxes = Object.values(pairs)
+    .reduce((acc, id) => (acc[id] = document.getElementById(id), acc), {});
+
+  function activate(id){
+    Object.values(boxes).forEach(b => b.classList.remove('active'));
+    if (boxes[id]) boxes[id].classList.add('active');
+  }
+  function clear(){ Object.values(boxes).forEach(b => b.classList.remove('active')); }
+
+  Object.entries(pairs).forEach(([segId, boxId]) => {
+    const seg = document.getElementById(segId);
+    if (!seg) return;
+    seg.addEventListener('mouseenter', () => activate(boxId));
+    seg.addEventListener('mouseleave', clear);
+  });
+
+  Object.values(boxes).forEach(box => {
+    box.addEventListener('mouseenter', () => box.classList.add('active'));
+    box.addEventListener('mouseleave', clear);
+  });
+
+  // (opțional) pornește cu "CINE SUNTEM?" vizibil:
+  // boxes["box-about"].classList.add("active");
+})();
+</script>
 {% endblock %}
