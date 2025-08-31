@@ -3,7 +3,7 @@
 
 {% block content %}
 <section class="blog-wrap">
-  <!-- ADN + butoane laterale -->
+  <!-- ADN + butoane (overlay) -->
   <aside class="blog-dna">
     <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
       <!-- helix -->
@@ -17,15 +17,20 @@
       <rect x="10" y="390" width="40" height="26" rx="4" fill="#e53935"/>
     </svg>
 
+    <!-- overlay peste ADN: ALBASTRU / ROȘU / ROȘU / ALBASTRU -->
     <nav class="blog-dna-nav">
-      <a href="{{ url_for('blog') }}#insta" class="pill pill-blue">INSTA</a>
+      <a href="{{ url_for('blog') }}#insta"    class="pill pill-blue">INSTA</a>
       <a href="{{ url_for('blog') }}#articles" class="pill pill-red">ARTICOLE</a>
-      <a href="{{ url_for('blog') }}#galerie" class="pill pill-blue">GALERIE</a>
-      {% if can_view_lessons %}
-        <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
-      {% endif %}
-      <a href="{{ url_for('index') }}" class="pill pill-blue">HOME</a>
+      <a href="{{ url_for('blog') }}#galerie"  class="pill pill-red">GALERIE</a>
+      <a href="{{ url_for('index') }}"         class="pill pill-blue">HOME</a>
     </nav>
+
+    {% if can_view_lessons %}
+    <!-- Lecții separat, sub overlay (ca să păstrăm schema cerută) -->
+    <nav class="blog-dna-nav-secondary">
+      <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
+    </nav>
+    {% endif %}
   </aside>
 
   <!-- CONȚINUT PRINCIPAL -->
@@ -92,25 +97,53 @@
   margin-top:18px;
 }
 
-/* ADN lateral + butoane */
+/* ADN + overlay */
 .blog-dna{
-  position:sticky;
-  top:16px;
-  align-self:start;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  display: block;          /* container simplu pentru overlay */
+  min-height: 520px;
 }
-.dna-slim{ width:100%; height:auto; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,.1)) }
+.dna-slim{
+  width: 120px;            /* ADN mai mic */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;              /* sub butoane */
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.1));
+}
 
-.blog-dna-nav{ display:flex; flex-direction:column; gap:12px }
+/* Overlay-ul cu butoane, peste ADN */
+.blog-dna-nav{
+  position: absolute;
+  top: 14%;                /* ajustează dacă vrei mai sus/jos */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;            /* lățimea stivei de butoane */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+/* Lecții – separat sub overlay (opțional) */
+.blog-dna-nav-secondary{
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Butoane */
 .pill{
-  display:block; text-align:center; padding:10px 12px; border-radius:14px;
+  display:block; text-align:center; padding:12px 14px; border-radius:16px;
   font-weight:800; color:#fff; text-decoration:none;
-  box-shadow:0 4px 12px rgba(0,0,0,.1)
+  box-shadow:0 6px 16px rgba(0,0,0,.12)
 }
 .pill-blue{ background:#1e88e5 }
-.pill-red{ background:#e53935 }
+.pill-red { background:#e53935 }
 
 /* Conținutul din dreapta */
 .posts-title{
@@ -132,7 +165,7 @@
 .gallery-img{ max-width:100%; border-radius:6px; margin:10px 0 }
 .post-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
 
-/* Butoane */
+/* Butoane card */
 .btn{ display:inline-block; padding:10px 14px; border-radius:10px; background:#2f8f4f; color:#fff; text-decoration:none; font-weight:800 }
 .btn:hover{ opacity:.92 }
 .btn.ghost{ background:transparent; color:#2f8f4f; border:2px solid #2f8f4f }
@@ -140,9 +173,22 @@
 /* Responsive */
 @media (max-width: 980px){
   .blog-wrap{ grid-template-columns:1fr }
-  .blog-dna{ position:static; flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap }
-  .dna-slim{ width:180px }
-  .blog-dna-nav{ flex-direction:row; flex-wrap:wrap; gap:10px; justify-content:center }
+  .blog-dna{ position:static; min-height:unset; display:flex; flex-direction:column; align-items:center }
+  .dna-slim{ width:140px }
+  .blog-dna-nav{
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: 420px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap:10px;
+    margin-top: 10px;
+  }
+  .blog-dna-nav-secondary{
+    justify-content:center;
+  }
 }
 </style>
 
