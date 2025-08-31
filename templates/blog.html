@@ -3,6 +3,7 @@
 
 {% block content %}
 <section class="blog-wrap">
+  <!-- ADN + butoane laterale -->
   <aside class="blog-dna">
     <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
       <!-- helix -->
@@ -10,91 +11,142 @@
             fill="none" stroke="#2e7d32" stroke-width="4"/>
       <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
             fill="none" stroke="#1565c0" stroke-width="4"/>
-      <!-- benzi color pentru secțiuni -->
+      <!-- benzi -->
       <rect x="10" y="70"  width="40" height="26" rx="4" fill="#43a047"/>
       <rect x="10" y="230" width="40" height="26" rx="4" fill="#1976d2"/>
       <rect x="10" y="390" width="40" height="26" rx="4" fill="#e53935"/>
     </svg>
 
-    <!-- butoane filtrare (opțional, dacă le ai deja, păstrează-le acolo) -->
     <nav class="blog-dna-nav">
       <a href="{{ url_for('blog') }}#insta" class="pill pill-blue">INSTA</a>
       <a href="{{ url_for('blog') }}#articles" class="pill pill-red">ARTICOLE</a>
       <a href="{{ url_for('blog') }}#galerie" class="pill pill-blue">GALERIE</a>
-      <a href="{{ url_for('index') }}" class="pill pill-red">HOME</a>
+      {% if can_view_lessons %}
+        <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
+      {% endif %}
+      <a href="{{ url_for('index') }}" class="pill pill-blue">HOME</a>
     </nav>
   </aside>
 
-  <div class="blog-content">
-    {# aici rămâne căutarea + lista de postări #}
-    {{ super() if false }}
-    <!-- pune conținutul tău existent: search, posts loop etc. -->
-  </div>
-</section>
-
-
   <!-- CONȚINUT PRINCIPAL -->
-  <div class="blog-main">
-    <h2>---------------------------POSTARI!-----------------------</h2>
+  <div class="blog-content">
+    <h2 class="posts-title">POSTĂRI</h2>
 
-    <!-- CĂUTARE TITLU -->
+    <!-- Căutare după titlu -->
     <div class="search-bar">
       <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu...">
     </div>
 
-    <!-- POSTĂRI DIN DB -->
+    <!-- Lista postărilor -->
     {% for p in posts %}
-      <div class="post-item"
-           data-section="{{ p.section }}"
-           data-title="{{ (p.title or '')|lower }}">
-        <h3>
-          {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% else %}Articol:{% endif %}
-          {{ p.title }}
-        </h3>
+      <article class="post-item"
+               id="{{ p.section }}"
+               data-section="{{ p.section }}"
+               data-title="{{ (p.title or '')|lower }}">
 
-        <small>
-          <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
-          | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') if p.created_at else '' }}
-          | <strong>Secțiune:</strong>
-          {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% else %}Articol{% endif %}
-        </small>
+        <header class="post-head">
+          <h3 class="post-title">
+            {% if p.section == 'insta' %}Insta:{% elif p.section == 'gallery' %}Galerie:{% elif p.section == 'lectii' %}Lecție:{% else %}Articol:{% endif %}
+            {{ p.title }}
+          </h3>
+          <small class="meta">
+            <strong>Autor:</strong> {{ p.author or 'Club BIO' }}
+            {% if p.created_at %} | <strong>Data:</strong> {{ p.created_at.strftime('%Y-%m-%d') }}{% endif %}
+            | <strong>Secțiune:</strong>
+            {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
+          </small>
+        </header>
 
         {% if p.image_url %}
           <img src="{{ p.image_url }}" class="gallery-img" alt="cover">
         {% endif %}
 
         {% if p.content %}
-          <p>{{ p.content }}</p>
+          <p class="post-body">{{ p.content }}</p>
         {% endif %}
 
-        {% if p.external_url %}
-          <p><a href="{{ p.external_url }}" target="_blank" rel="noopener">Vezi link</a></p>
-        {% endif %}
-      </div>
+        <div class="post-actions">
+          {% if p.external_url %}
+            <a class="btn ghost" target="_blank" rel="noopener" href="{{ p.external_url }}">Link extern</a>
+          {% endif %}
+
+          {# DOAR pentru 'lectii': buton spre prezentare dacă există link #}
+          {% if p.section == 'lectii' and p.ppt_url %}
+            <a class="btn" target="_blank" rel="noopener" href="{{ p.ppt_url }}">Deschide prezentarea</a>
+          {% endif %}
+        </div>
+      </article>
     {% else %}
       <p>Nu există postări încă. Adaugă din <a href="{{ url_for('admin_new') }}">admin</a>.</p>
     {% endfor %}
   </div>
 </section>
 
+<!-- STILURI specifice blogului -->
 <style>
-.blog-wrapper { display:flex; gap:30px; margin-top:30px; }
-.blog-sidebar { width:180px; display:flex; flex-direction:column; gap:15px; padding-left:10px; }
-.nav-btn { padding:15px; font-weight:700; border:none; color:#fff; cursor:pointer; transform:skew(-15deg); font-size:16px; transition:background .2s ease; }
-.nav-btn:hover { opacity:.9; }
-.nav-btn.insta { background:#1da1f2; }
-.nav-btn.article { background:#e63946; }
-.nav-btn.gallery { background:#1da1f2; }
-.nav-btn.home { background:#e63946; }
-.nav-deco { height:40px; background:#ccc; transform:skew(-15deg); opacity:.2; }
-.blog-main { flex:1; }
-.search-bar { margin-bottom:20px; }
-#searchInput { width:100%; padding:10px; font-size:16px; border-radius:6px; border:1px solid #ccc; }
-.post-item { background:#fff; border-left:5px solid #28a745; margin-bottom:20px; padding:15px; border-radius:6px; }
-.post-item small { display:block; margin-bottom:10px; font-size:13px; color:#666; }
-.gallery-img { max-width:100%; border-radius:6px; margin-top:10px; }
+/* Layout general */
+.blog-wrap{
+  display:grid;
+  grid-template-columns: 240px 1fr;
+  gap:24px;
+  margin-top:18px;
+}
+
+/* ADN lateral + butoane */
+.blog-dna{
+  position:sticky;
+  top:16px;
+  align-self:start;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.dna-slim{ width:100%; height:auto; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,.1)) }
+
+.blog-dna-nav{ display:flex; flex-direction:column; gap:12px }
+.pill{
+  display:block; text-align:center; padding:10px 12px; border-radius:14px;
+  font-weight:800; color:#fff; text-decoration:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.1)
+}
+.pill-blue{ background:#1e88e5 }
+.pill-red{ background:#e53935 }
+
+/* Conținutul din dreapta */
+.posts-title{
+  text-align:center; margin:0 0 14px; color:#114411; letter-spacing:2px;
+  border-top:3px dashed #1b5e20; padding-top:12px;
+}
+.search-bar{ margin-bottom:20px }
+#searchInput{ width:100%; padding:10px; font-size:16px; border-radius:6px; border:1px solid #ccc }
+
+/* Card postare */
+.post-item{
+  background:#fff; border-left:5px solid #28a745; margin-bottom:20px; padding:15px; border-radius:8px;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+.post-head{ margin-bottom:8px }
+.post-title{ margin:0 0 6px }
+.meta{ display:block; color:#666; font-size:13px }
+.post-body{ margin-top:8px }
+.gallery-img{ max-width:100%; border-radius:6px; margin:10px 0 }
+.post-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
+
+/* Butoane */
+.btn{ display:inline-block; padding:10px 14px; border-radius:10px; background:#2f8f4f; color:#fff; text-decoration:none; font-weight:800 }
+.btn:hover{ opacity:.92 }
+.btn.ghost{ background:transparent; color:#2f8f4f; border:2px solid #2f8f4f }
+
+/* Responsive */
+@media (max-width: 980px){
+  .blog-wrap{ grid-template-columns:1fr }
+  .blog-dna{ position:static; flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap }
+  .dna-slim{ width:180px }
+  .blog-dna-nav{ flex-direction:row; flex-wrap:wrap; gap:10px; justify-content:center }
+}
 </style>
 
+<!-- Script filtrare/căutare -->
 <script>
 function filterContent(section) {
   const allPosts = document.querySelectorAll('.post-item');
