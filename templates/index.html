@@ -2,16 +2,61 @@
 {% block title %}Vianu Biologists{% endblock %}
 
 {% block content %}
-<main class="home-grid">
-  <section class="dna-canvas">
-    <div class="bridge" data-info="CINE SUNTEM?"></div>
-    <div class="bridge" data-info="BLOG!"></div>
-    <div class="bridge" data-info="GALERIE"></div>
+<div class="homepage">
+
+  <header class="hp-header">
+    <h1>Vianu Biologists</h1>
+    <p>Biologie × Robotică × AI</p>
+  </header>
+
+  <section class="dna-layout">
+
+    <!-- dreapta sus -->
+    <article class="dna-box box-about">
+      <h2>CINE SUNTEM?</h2>
+      <p>Despre club, valori, proiecte.</p>
+      <a class="btn" href="{{ url_for('about') }}">Vezi echipa</a>
+    </article>
+
+    <!-- stânga mijloc -->
+    <article class="dna-box box-gallery">
+      <h2>GALERIE</h2>
+      <p>Proiecte & evenimente.</p>
+      <a class="btn ghost" href="{{ url_for('blog') }}#galerie">Deschide</a>
+    </article>
+
+    <!-- dreapta jos -->
+    <article class="dna-box box-blog">
+      <h2>BLOG</h2>
+      <p>Ultimele noutăți.</p>
+      <a class="btn" href="{{ url_for('blog') }}">Citește</a>
+    </article>
+
+    <!-- coloana centrală: ADN -->
+    <div class="dna-center">
+      <svg class="dna-svg" viewBox="0 0 200 600" aria-label="ADN decorativ">
+        <!-- rungs -->
+        <g opacity="0.25">
+          {% for y in range(40, 560, 40) %}
+          <line x1="70" y1="{{ y }}" x2="130" y2="{{ y }}" stroke="#222" stroke-width="2"/>
+          {% endfor %}
+        </g>
+        <!-- helix stânga/dreapta -->
+        <path d="M70,20 C 20,120 180,180 130,260 C 80,340 120,420 70,500 C 40,550 40,580 70,590"
+              fill="none" stroke="#2e7d32" stroke-width="6"/>
+        <path d="M130,20 C 180,120 20,180 70,260 C 120,340 80,420 130,500 C 160,550 160,580 130,590"
+              fill="none" stroke="#1565c0" stroke-width="6"/>
+        <!-- benzi color (sus/mid/jos) -->
+        <rect x="60" y="80"  width="80" height="40" rx="6" fill="#43a047" opacity="0.25"/>
+        <rect x="60" y="280" width="80" height="40" rx="6" fill="#1976d2" opacity="0.25"/>
+        <rect x="60" y="480" width="80" height="40" rx="6" fill="#e53935" opacity="0.25"/>
+      </svg>
+    </div>
+
   </section>
 
-  <aside class="info-panel">
-    <h2 id="info-title">Plimbă cursorul peste ADN</h2>
-    <p id="info-text">Apropie cursorul de punțile evidențiate pentru info context.</p>
-  </aside>
-</main>
+  <footer class="hp-footer">
+    <p>Contact: <a href="mailto:vianubiologists@example.com">vianubiologists@example.com</a></p>
+  </footer>
+</div>
 {% endblock %}
