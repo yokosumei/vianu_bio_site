@@ -10,9 +10,12 @@
       {% for m in team %}
       <figure class="member">
         <img
-  src="{{ url_for('static', filename='images/' ~ (m.photo or 'placeholder.jpg')) }}"
+  src="{{ url_for('static',
+        filename=(m.photo if '/' in (m.photo or '')
+                  else 'images/' ~ (m.photo or 'placeholder.jpg'))) }}"
   alt="{{ m.name }}"
   loading="lazy">
+
         <figcaption>{{ m.name }}</figcaption>
       </figure>
       {% endfor %}
