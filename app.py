@@ -64,11 +64,10 @@ def _ensure_columns():
     Funcționează pentru SQLite și Postgres (ignoră eroarea dacă deja există).
     """
     try:
-        # SQLite ACCEPTĂ ALTER simplu; Postgres la fel, dacă nu există deja.
         with db.engine.begin() as con:
             con.execute(text("ALTER TABLE post ADD COLUMN ppt_url VARCHAR(512);"))
     except Exception:
-        # Presupunem că există deja coloana sau altă eroare non-critică.
+        # probabil există deja coloana; ignorăm
         pass
 
 def _init_db_once():
@@ -102,7 +101,7 @@ def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if not session.get("logged_in"):
-            return redirect(url_for("login_page"))
+            return redirect(url_for("login"))
         return fn(*args, **kwargs)
     return wrapper
 
@@ -149,7 +148,7 @@ def health():
     return {"ok": True}
 
 # -------------------- AUTH --------------------
-@app.get("/login")
+@app.get("/login", endpoint="login")
 def login_page():
     return render_template("login.html")
 
@@ -160,7 +159,7 @@ def login_action():
     u = User.query.filter_by(email=email).first()
     if not u or not check_password_hash(u.password_hash, pwd):
         flash("Credențiale invalide", "error")
-        return redirect(url_for("login_page"))
+        return redirect(url_for("login"))
     session["logged_in"] = True
     session["user_email"] = u.email
     flash("Autentificat cu succes.", "success")
@@ -188,7 +187,7 @@ def admin_new_post():
     ppt_url = request.form.get("ppt_url", "").strip()
     author = session.get("user_email", "Admin")
 
-    # Dacă utilizatorul NU are drept de 'lectii', forțăm secțiunea să nu fie 'lectii'
+    # Dacă utilizatorul NU are drept de 'lectii', blochează
     if section == "lectii" and not can_view_lessons():
         flash("Nu ai drepturi să publici în 'Lecții'.", "error")
         return redirect(url_for("admin_new"))
