@@ -205,6 +205,14 @@
 </style>
 
 <script>
+const FILTER_MAP = {
+  '#all': 'all',
+  '#insta': 'insta',
+  '#articles': 'articles',
+  '#galerie': 'gallery',   // hash în română -> valoare din DB
+  '#lectii': 'lectii'
+};
+
 function filterContent(section) {
   const allPosts = document.querySelectorAll('.post-item');
   allPosts.forEach(post => {
@@ -212,6 +220,45 @@ function filterContent(section) {
     post.style.display = (section === 'all' || postSection === section) ? 'block' : 'none';
   });
 }
+
+function highlightActive(section){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  // găsește hash-ul corespunzător secțiunii curente
+  const matchHash = Object.keys(FILTER_MAP).find(h => FILTER_MAP[h] === section);
+  if(matchHash){
+    document.querySelectorAll(`.blog-dna-nav a[href$="${matchHash}"], .blog-dna-nav-secondary a[href$="${matchHash}"]`)
+      .forEach(a=>a.classList.add('active'));
+  }
+}
+
+function applyFromHash(){
+  const h = (location.hash || '').toLowerCase();
+  const section = FILTER_MAP[h] || 'all';
+  filterContent(section);
+  highlightActive(section);
+}
+
+// Interceptează click-urile pe butoanele cu hash, setează hash-ul și aplică filtrul
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.blog-dna-nav a, .blog-dna-nav-secondary a').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      const href = a.getAttribute('href') || '';
+      const i = href.indexOf('#');
+      if (i !== -1){
+        e.preventDefault();
+        location.hash = href.substring(i);
+        applyFromHash();
+      }
+    });
+  });
+
+  applyFromHash(); // aplică filtrul la încărcarea paginii
+});
+
+// Dacă utilizatorul schimbă hash-ul manual
+window.addEventListener('hashchange', applyFromHash);
+
+// Căutarea după titlu rămâne neschimbată
 function searchPosts() {
   const input = (document.getElementById("searchInput").value || "").toLowerCase();
   const posts = document.querySelectorAll(".post-item");
@@ -221,4 +268,5 @@ function searchPosts() {
   });
 }
 </script>
+
 {% endblock %}
