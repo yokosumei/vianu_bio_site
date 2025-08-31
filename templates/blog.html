@@ -64,19 +64,30 @@
           <p class="post-body">{{ p.content }}</p>
         {% endif %}
 
-        <div class="post-actions">
-          {% if p.external_url %}
-            <a class="btn ghost" target="_blank" rel="noopener" href="{{ p.external_url }}">Link extern</a>
+      <div class="post-actions">
+        {# EXTERNAL_URL: dacă e PDF -> „Descarcă PDF” + „Vezi în browser”; altfel Link extern #}
+        {% if p.external_url %}
+          {% set link = p.external_url %}
+          {% if link and (link|lower).endswith('.pdf') %}
+            <a class="btn btn-download" href="{{ link }}" download>Descarcă PDF</a>
+            <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Vezi în browser</a>
+          {% else %}
+            <a class="btn ghost" href="{{ link }}" target="_blank" rel="noopener">Link extern</a>
           {% endif %}
-          {% if p.section == 'lectii' and p.ppt_url %}
-            <a class="btn" target="_blank" rel="noopener" href="{{ p.ppt_url }}">Deschide prezentarea</a>
+        {% endif %}
+      
+        {# LECȚII: dacă ppt_url e PDF -> „Descarcă PDF” + „Vezi în browser”; altfel „Deschide prezentarea” #}
+        {% if p.section == 'lectii' and p.ppt_url %}
+          {% set link2 = p.ppt_url %}
+          {% if link2 and (link2|lower).endswith('.pdf') %}
+            <a class="btn btn-download" href="{{ link2 }}" download>Descarcă PDF</a>
+            <a class="btn ghost" href="{{ link2 }}" target="_blank" rel="noopener">Vezi în browser</a>
+          {% else %}
+            <a class="btn" href="{{ link2 }}" target="_blank" rel="noopener">Deschide prezentarea</a>
           {% endif %}
-        </div>
-      </article>
-    {% else %}
-      <p>Nu există postări încă. Adaugă din <a href="{{ url_for('admin_new') }}">admin</a>.</p>
-    {% endfor %}
-  </div>
+        {% endif %}
+      </div>
+
 </section>
 
 <style>
