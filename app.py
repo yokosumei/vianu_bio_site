@@ -129,6 +129,21 @@ def blog():
         posts = Post.query.order_by(Post.created_at.desc()).limit(100).all()
     return render_template("blog.html", posts=posts, can_view_lessons=can_view_lessons())
 
+# -------------------- ABOUT --------------------
+@app.get("/about", endpoint="about")
+def about():
+    import os, json
+    team = []
+    data_path = os.path.join("static", "data", "team.json")
+    if os.path.exists(data_path):
+        try:
+            with open(data_path, "r", encoding="utf-8") as f:
+                team = json.load(f)
+        except Exception:
+            team = []
+    return render_template("about.html", team=team)
+
+
 @app.get("/api/posts")
 def api_posts():
     q = Post.query
