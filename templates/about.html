@@ -3,29 +3,51 @@
 
 {% block content %}
 <section class="about">
-  <header class="about-hero">
-    <h1>Despre noi</h1>
-    <p>Suntem o echipă de elevi pasionați de biologie, robotică și AI.</p>
-  </header>
+  <h1 class="about-title">Echipa</h1>
 
   <div class="team-grid">
     {% if team %}
       {% for m in team %}
-      <article class="member-card">
-        <div class="avatar" style="background-image:url('{{ url_for('static', filename=m.photo or 'images/team/placeholder.jpg') }}')"></div>
-        <h3>{{ m.name }}</h3>
-        {% if m.role %}<p class="role">{{ m.role }}</p>{% endif %}
-        {% if m.bio %}<p class="bio">{{ m.bio }}</p>{% endif %}
-        <div class="links">
-          {% if m.instagram %}<a target="_blank" href="{{ m.instagram }}">Instagram</a>{% endif %}
-          {% if m.github %}<a target="_blank" href="{{ m.github }}">GitHub</a>{% endif %}
-          {% if m.site %}<a target="_blank" href="{{ m.site }}">Website</a>{% endif %}
-        </div>
-      </article>
+      <figure class="member">
+        <img
+          src="{{ url_for('static', filename=m.photo or 'images/team/placeholder.jpg') }}"
+          alt="{{ m.name }}"
+          loading="lazy">
+        <figcaption>{{ m.name }}</figcaption>
+      </figure>
       {% endfor %}
     {% else %}
       <p>Adaugă membri în <code>static/data/team.json</code> ca să apară aici.</p>
     {% endif %}
   </div>
 </section>
+
+<style>
+.about{ padding-top: 10px; }
+.about-title{
+  text-align:center; margin:0 0 18px; letter-spacing:1px; color:#114411;
+  border-top:3px dashed #1b5e20; padding-top:12px;
+}
+.team-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 22px;
+  align-items:start;
+}
+.member{
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  padding:14px; background:#fff; border-radius:14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+}
+.member img{
+  width:130px; height:130px; object-fit:cover; border-radius:999px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.10);
+}
+.member figcaption{
+  font-weight:800; text-align:center;
+}
+@media (max-width: 600px){
+  .member img{ width:110px; height:110px; }
+}
+</style>
 {% endblock %}
