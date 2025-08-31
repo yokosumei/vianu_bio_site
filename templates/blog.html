@@ -2,16 +2,36 @@
 {% block title %}Blog & Galerie – Vianu Biologists{% endblock %}
 
 {% block content %}
-<section class="blog-wrapper">
-  <!-- SIDEBAR ADN -->
-  <aside class="blog-sidebar">
-    <button class="nav-btn insta"   onclick="filterContent('insta')">INSTA</button>
-    <button class="nav-btn article" onclick="filterContent('articles')">ARTICOLE</button>
-    <div class="nav-deco"></div>
-    <div class="nav-deco"></div>
-    <button class="nav-btn gallery" onclick="filterContent('gallery')">GALERIE</button>
-    <button class="nav-btn home"    onclick="window.location.href='/'">HOME</button>
+<section class="blog-wrap">
+  <aside class="blog-dna">
+    <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
+      <!-- helix -->
+      <path d="M20,10 C5,80 55,120 40,180 C25,240 35,300 20,360 C10,420 15,470 20,490"
+            fill="none" stroke="#2e7d32" stroke-width="4"/>
+      <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
+            fill="none" stroke="#1565c0" stroke-width="4"/>
+      <!-- benzi color pentru secțiuni -->
+      <rect x="10" y="70"  width="40" height="26" rx="4" fill="#43a047"/>
+      <rect x="10" y="230" width="40" height="26" rx="4" fill="#1976d2"/>
+      <rect x="10" y="390" width="40" height="26" rx="4" fill="#e53935"/>
+    </svg>
+
+    <!-- butoane filtrare (opțional, dacă le ai deja, păstrează-le acolo) -->
+    <nav class="blog-dna-nav">
+      <a href="{{ url_for('blog') }}#insta" class="pill pill-blue">INSTA</a>
+      <a href="{{ url_for('blog') }}#articles" class="pill pill-red">ARTICOLE</a>
+      <a href="{{ url_for('blog') }}#galerie" class="pill pill-blue">GALERIE</a>
+      <a href="{{ url_for('index') }}" class="pill pill-red">HOME</a>
+    </nav>
   </aside>
+
+  <div class="blog-content">
+    {# aici rămâne căutarea + lista de postări #}
+    {{ super() if false }}
+    <!-- pune conținutul tău existent: search, posts loop etc. -->
+  </div>
+</section>
+
 
   <!-- CONȚINUT PRINCIPAL -->
   <div class="blog-main">
