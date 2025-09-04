@@ -4,16 +4,7 @@
 {% block content %}
 <section class="blog-wrap fancy-bg">
 
-  <!-- ADN + butoane (overlay) -->
-  <aside class="blog-dna">
-    <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
-      <path d="M20,10 C5,80 55,120 40,180 C25,240 35,300 20,360 C10,420 15,470 20,490"
-            fill="none" stroke="#2e7d32" stroke-width="4"/>
-      <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
-            fill="none" stroke="#1976d2" stroke-width="4"/>
-    </svg>
-
-    <h1 class="brand-title blog-title"><span>Postări</span></h1>
+      <h1 class="brand-title blog-title"><span>Postări</span></h1>
 
     <nav class="blog-dna-nav">
       <a href="{{ url_for('blog') }}#insta"    class="pill pill-blue">INSTA</a>
@@ -27,6 +18,16 @@
       <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
     </nav>
     {% endif %}
+  
+  <!-- ADN + butoane (overlay) -->
+  <aside class="blog-dna">
+    <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
+      <path d="M20,10 C5,80 55,120 40,180 C25,240 35,300 20,360 C10,420 15,470 20,490"
+            fill="none" stroke="#2e7d32" stroke-width="4"/>
+      <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
+            fill="none" stroke="#1976d2" stroke-width="4"/>
+    </svg>
+
   </aside>
 
   <!-- CONȚINUT PRINCIPAL -->
