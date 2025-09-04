@@ -1,8 +1,8 @@
 [
-  { "name": "Maria Ivan - președinte", "photo": "maria.jpg" },
-  { "name": "Natasha Vicoleanu - vicepreședinte", "photo": "nana.jpg" },
-  { "name": "Mara Surugiu - directoare PR", "photo": "ilinca.jpg" },
-  { "name": "Radu Zambitchi - director PR", "photo": "radu.jpg" },
-  { "name": "Mihai Dima - director design", "photo": "mihai.jpg" },
-  { "name": "Daria Stan - IT specialist", "photo": "benjamin.jpg" }
+  { "name": "Maria Ivan - președinte", "photo": "images/maria.jpg" },
+  { "name": "Natasha Vicoleanu - vicepreședinte", "photo": "images/nana.jpg" },
+  { "name": "Mara Surugiu - directoare PR", "photo": "images/ilinca.jpg" },
+  { "name": "Radu Zambitchi - director PR", "photo": "images/radu.jpg" },
+  { "name": "Mihai Dima - director design", "photo": "images/mihai.jpg" },
+  { "name": "Daria Stan - IT specialist", "photo": "images/benjamin.jpg" }
 ]
