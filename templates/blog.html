@@ -2,50 +2,58 @@
 {% block title %}Blog & Galerie – Vianu Biologists{% endblock %}
 
 {% block content %}
-<section class="blog-wrap fancy-bg">
+<section class="blog-shell fancy-bg">
 
-      <h1 class="brand-title blog-title"><span>Postări</span></h1>
-
-    <nav class="blog-dna-nav">
-      <a href="{{ url_for('blog') }}#insta"    class="pill pill-blue">INSTA</a>
-      <a href="{{ url_for('blog') }}#articles" class="pill pill-gold">ARTICOLE</a>
-      <a href="{{ url_for('blog') }}#galerie"  class="pill pill-green">GALERIE</a>
-      <a href="{{ url_for('index') }}"         class="pill pill-blue">HOME</a>
+  <!-- STÂNGA: meniu vertical + ADN dedesubt -->
+  <aside class="blog-sidebar">
+    <nav class="side-menu">
+      <a href="{{ url_for('blog') }}#insta"    class="side-link" data-section="insta">INSTA</a>
+      <a href="{{ url_for('blog') }}#articles" class="side-link" data-section="articles">ARTICOLE</a>
+      <a href="{{ url_for('blog') }}#galerie"  class="side-link" data-section="gallery">GALERIE</a>
+      <a href="{{ url_for('index') }}"         class="side-link" data-section="home">HOME</a>
+      {% if can_view_lessons %}
+      <a href="{{ url_for('blog') }}#lectii"   class="side-link" data-section="lectii">LECȚII</a>
+      {% endif %}
     </nav>
 
-    {% if can_view_lessons %}
-    <nav class="blog-dna-nav-secondary">
-      <a href="{{ url_for('blog') }}#lectii" class="pill pill-red">LECȚII</a>
-    </nav>
-    {% endif %}
-  
-  <!-- ADN + butoane (overlay) -->
-  <aside class="blog-dna">
-    <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ lateral">
-      <path d="M20,10 C5,80 55,120 40,180 C25,240 35,300 20,360 C10,420 15,470 20,490"
-            fill="none" stroke="#2e7d32" stroke-width="4"/>
-      <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
-            fill="none" stroke="#1976d2" stroke-width="4"/>
-    </svg>
-
+    <div class="dna-holder">
+      <svg viewBox="0 0 60 500" class="dna-slim" aria-label="ADN decorativ">
+        <path d="M20,10 C5,80 55,120 40,180 C25,240 35,300 20,360 C10,420 15,470 20,490"
+              fill="none" stroke="#2e7d32" stroke-width="4"/>
+        <path d="M40,10 C55,80 5,120 20,180 C35,240 25,300 40,360 C50,420 45,470 40,490"
+              fill="none" stroke="#1976d2" stroke-width="4"/>
+      </svg>
+    </div>
   </aside>
 
-  <!-- CONȚINUT PRINCIPAL -->
-  <div class="blog-content">
-    <!-- Căutare -->
+  <!-- DREAPTA: conținut (carduri) -->
+  <div class="blog-main">
+    <h1 class="brand-title blog-title"><span>Postări</span></h1>
+
     <div class="search-bar">
       <input type="text" id="searchInput" onkeyup="searchPosts()" placeholder="Caută după titlu…">
     </div>
 
-    <!-- Grid de postări -->
-    <section class="posts-grid">
+    <section class="posts-list">
       {% for p in posts %}
       <article class="post-card"
                id="{{ p.section }}{{ p.id }}"
                data-section="{{ p.section }}"
                data-title="{{ (p.title or '')|lower }}">
 
-        <a class="cover" href="{{ url_for('blog') }}#{{ p.section }}">
+        <header class="post-head">
+          <div class="badge-row">
+            <span class="badge {% if p.section=='insta' %}b-blue{% elif p.section=='gallery' %}b-green{% elif p.section=='lectii' %}b-red{% else %}b-gold{% endif %}">
+              {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
+            </span>
+            {% if p.created_at %}<small class="meta">{{ p.created_at.strftime('%Y-%m-%d') }}</small>{% endif %}
+          </div>
+          <h3 class="post-title">{{ p.title }}</h3>
+        </header>
+
+        {# === IMAGINE COVER (opțional) ===
+           Preferă p.cover_src (din app.py). Dacă nu există, încearcă p.image_url -> uploads -> placeholder. #}
+        <div class="cover">
           {% set img = (p.cover_src if p.cover_src is defined else p.image_url) or '' %}
           {% if img %}
             {% if img.startswith('http') or img.startswith('/static/') %}
@@ -58,48 +66,68 @@
           {% else %}
             <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" alt="Fără imagine" loading="lazy">
           {% endif %}
-        </a>
-
-        <div class="body">
-          <div class="badge-row">
-            <span class="badge {% if p.section=='insta' %}b-blue{% elif p.section=='gallery' %}b-green{% elif p.section=='lectii' %}b-red{% else %}b-gold{% endif %}">
-              {% if p.section == 'insta' %}Insta{% elif p.section == 'gallery' %}Galerie{% elif p.section == 'lectii' %}Lecții{% else %}Articol{% endif %}
-            </span>
-            {% if p.created_at %}
-            <small class="meta">{{ p.created_at.strftime('%Y-%m-%d') }}</small>
-            {% endif %}
-          </div>
-
-          <h3 class="post-title">{{ p.title }}</h3>
-
-          {% if p.content %}
-          <p class="post-excerpt">
-            {{ p.content[:220] }}{% if p.content|length > 220 %}…{% endif %}
-          </p>
-          {% endif %}
-
-          <div class="actions">
-            {% if p.external_url %}
-              {% set link = p.external_url %}
-              {% if link and (link|lower).endswith('.pdf') %}
-                <a class="btn btn-solid" href="{{ link }}" download>Descarcă PDF</a>
-                <a class="btn btn-ghost" href="{{ link }}" target="_blank" rel="noopener">Vezi în browser</a>
-              {% else %}
-                <a class="btn btn-ghost" href="{{ link }}" target="_blank" rel="noopener">Link extern</a>
-              {% endif %}
-            {% endif %}
-
-            {% if p.section == 'lectii' and p.ppt_url %}
-              {% set link2 = p.ppt_url %}
-              {% if link2 and (link2|lower).endswith('.pdf') %}
-                <a class="btn btn-solid" href="{{ link2 }}" download>Descarcă PDF</a>
-                <a class="btn btn-ghost" href="{{ link2 }}" target="_blank" rel="noopener">Vezi în browser</a>
-              {% else %}
-                <a class="btn btn-solid" href="{{ link2 }}" target="_blank" rel="noopener">Deschide prezentarea</a>
-              {% endif %}
-            {% endif %}
-          </div>
         </div>
+
+        {# === CONȚINUT TEXT === #}
+        {% if p.content %}
+        <div class="post-text">
+          <p>{{ p.content }}</p>
+        </div>
+        {% endif %}
+
+        {# === GALERIE: mai multe imagini într-o postare ===
+           Pune în "content" o listă de imagini separate prin virgulă sau linii.
+           Exemplu:
+             img1.jpg, img2.jpg, https://site/poza.png
+           sau:
+             img1.jpg
+             img2.jpg
+             https://site/poza.png
+        #}
+        {% if p.section == 'gallery' and p.content %}
+          {% set raw = p.content.replace('\r','\n') %}
+          {% set items = (raw.split(',') if ',' in raw else raw.split('\n')) %}
+          {% set clean = [] %}
+          {% for it in items %}
+            {% if it.strip() %}{% set _ = clean.append(it.strip()) %}{% endif %}
+          {% endfor %}
+          {% if clean|length > 1 %}
+          <div class="gallery-grid">
+            {% for gi in clean %}
+              {% if gi.startswith('http') or gi.startswith('/static/') %}
+                <img src="{{ gi }}" alt="galerie" loading="lazy"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+              {% else %}
+                <img src="{{ url_for('static', filename='uploads/' ~ gi) }}?v={{ p.id ~ '-' ~ loop.index }}" alt="galerie" loading="lazy"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endif %}
+
+        {# === ACȚIUNI / LINK-URI === #}
+        <div class="actions">
+          {% if p.external_url %}
+            {% set link = p.external_url %}
+            {% if link and (link|lower).endswith('.pdf') %}
+              <a class="btn btn-solid" href="{{ link }}" download>Descarcă PDF</a>
+              <a class="btn btn-ghost" href="{{ link }}" target="_blank" rel="noopener">Vezi în browser</a>
+            {% else %}
+              <a class="btn btn-ghost" href="{{ link }}" target="_blank" rel="noopener">Deschide linkul</a>
+            {% endif %}
+          {% endif %}
+          {% if p.section == 'lectii' and p.ppt_url %}
+            {% set link2 = p.ppt_url %}
+            {% if link2 and (link2|lower).endswith('.pdf') %}
+              <a class="btn btn-solid" href="{{ link2 }}" download>Descarcă PDF</a>
+              <a class="btn btn-ghost" href="{{ link2 }}" target="_blank" rel="noopener">Vezi în browser</a>
+            {% else %}
+              <a class="btn btn-solid" href="{{ link2 }}" target="_blank" rel="noopener">Deschide prezentarea</a>
+            {% endif %}
+          {% endif %}
+        </div>
+
       </article>
       {% else %}
         <p>Nu există postări încă. Adaugă din <a href="{{ url_for('admin_new') }}">admin</a>.</p>
@@ -109,58 +137,52 @@
 </section>
 
 <style>
-/* ===== Paletă bej + accente (potrivire cu Home/About) ===== */
+/* ===== Paletă / fundal (potrivit cu Home & About) ===== */
 :root{
   --page-bg: #f6f1e6;
   --page-bg-2: #f1eadb;
   --ink: #0f172a;
   --muted: #6b7280;
   --ring: 32,129,80;
-
-  --brand-green: #2e7d32;
-  --brand-blue:  #1976d2;
-  --brand-gold:  #d6b35e;
-  --brand-red:   #e53935;
+  --brand-green:#2e7d32; --brand-blue:#1976d2; --brand-gold:#d6b35e; --brand-red:#e53935;
 }
-
-/* fundal cald cu accente radiale, ca la celelalte pagini */
 .fancy-bg{
   background:
     radial-gradient(1100px 280px at 12% -15%, rgba(233,210,160,.25), transparent 60%),
     radial-gradient(900px 260px at 88% -10%, rgba(121,173,110,.18), transparent 60%),
     linear-gradient(180deg, var(--page-bg), var(--page-bg-2) 65%);
-}
-
-/* ===== Layout general ===== */
-.blog-wrap{
-  display:grid;
-  grid-template-columns: 280px 1fr;
-  gap: 26px;
-  margin: 14px auto 36px;
-  width: min(1200px, 94%);
   color: var(--ink);
 }
 
-/* ===== Sidebar ADN + navigație ===== */
-.blog-dna{
-  position: sticky;
-  top: 16px;
-  align-self: start;
-}
-.dna-slim{
-  width: 140px;
-  height: auto;
-  display: block;
-  margin: 6px auto 0;
-  filter: drop-shadow(0 6px 18px rgba(0,0,0,.08));
+/* ===== Layout ===== */
+.blog-shell{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  gap: 26px;
+  width: min(1200px, 94%);
+  margin: 12px auto 36px;
 }
 
-.brand-title{
-  text-align:center; margin: 8px 0 10px; line-height:1.1;
+/* ===== Sidebar ===== */
+.blog-sidebar{ position: sticky; top: 16px; align-self: start; }
+.side-menu{ display:flex; flex-direction:column; gap:10px; }
+.side-link{
+  display:block; padding:10px 14px; border-radius:12px; text-decoration:none; font-weight:900;
+  background:#fffdf7; border:1px solid rgba(181,142,60,.22); color:#0f351a;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
 }
+.side-link:hover{ transform: translateX(3px); box-shadow: 0 12px 26px rgba(0,0,0,.10); }
+.side-link.active{ outline: 3px solid rgba(var(--ring), .22); background: #fff; }
+
+.dna-holder{ margin-top: 16px; display:grid; place-items:center; }
+.dna-slim{ width: 160px; height: auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,.08)); }
+
+/* ===== Main ===== */
+.blog-main{ min-width:0; }
+.brand-title{ text-align:center; margin: 2px 0 10px; line-height:1.1; }
 .brand-title span{
-  display:inline-block; font-weight: 900; letter-spacing:.6px;
-  font-size: clamp(22px, 3.6vw, 32px);
+  display:inline-block; font-weight:900; letter-spacing:.6px; font-size: clamp(22px, 3.6vw, 34px);
   background: linear-gradient(90deg, var(--brand-gold), #79b85f 40%, #5aa8ff);
   -webkit-background-clip: text; background-clip: text; color: transparent;
   position: relative; padding: 2px 6px;
@@ -173,56 +195,24 @@
 }
 .brand-title span:hover::after{ transform: scaleX(1); }
 
-.blog-dna-nav{
-  margin-top: 16px;
-  display:flex; flex-direction:column; gap: 12px; align-items:center;
-}
-.blog-dna-nav-secondary{
-  margin-top: 10px; display:flex; justify-content:center;
-}
-
-.pill{
-  display:block; text-align:center; padding:10px 14px; border-radius:999px;
-  font-weight:800; color:#fff; text-decoration:none; width: 200px;
-  box-shadow:0 8px 22px rgba(0,0,0,.08);
-  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
-}
-.pill:hover{ transform: translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.12); }
-.pill.active{ outline: 3px solid rgba(var(--ring), .25); }
-.pill-blue { background: var(--brand-blue); }
-.pill-green{ background: var(--brand-green); }
-.pill-gold { background: #caa34d; color:#10200b; }
-.pill-red  { background: var(--brand-red); }
-
-/* ===== Conținut dreapta ===== */
-.blog-content{ min-width: 0; }
-
-/* Search bar stilized */
 .search-bar{
-  background: #fffdf7; border:1px solid rgba(181,142,60,.22);
-  border-radius: 14px; padding: 10px 12px; margin: 6px 0 16px;
+  background:#fffdf7; border:1px solid rgba(181,142,60,.22);
+  border-radius:14px; padding:10px 12px; margin: 6px 0 16px;
   box-shadow: 0 8px 22px rgba(0,0,0,.06);
 }
 #searchInput{
   width:100%; padding:10px 12px; font-size:16px; border-radius:10px; border:1px solid rgba(0,0,0,.12);
-  outline:none;
 }
-#searchInput:focus{ border-color:#79b85f; box-shadow: 0 0 0 4px rgba(var(--ring), .12); }
+#searchInput:focus{ border-color:#79b85f; box-shadow: 0 0 0 4px rgba(var(--ring), .12); outline:none; }
 
-/* ===== Grid carduri post ===== */
-.posts-grid{
-  display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 22px;
-}
+/* ===== Carduri ===== */
+.posts-list{ display:grid; grid-template-columns: 1fr; gap: 18px; }
 
 .post-card{
-  background:#fff;
-  border:1px solid rgba(15,23,42,.06);
-  border-radius: 16px;
-  overflow: hidden;
-  display:flex; flex-direction:column;
+  background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px;
   box-shadow: 0 8px 24px rgba(0,0,0,.06);
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  overflow:hidden; padding: 12px 12px 14px;
   position: relative;
 }
 .post-card::before{
@@ -239,126 +229,93 @@
   border-color: rgba(15,23,42,.12);
 }
 
-.cover{ display:block; aspect-ratio: 16 / 10; overflow:hidden; background:#fffdf7; }
-.cover img{
-  width:100%; height:100%; object-fit:cover; display:block;
-  transform: scale(1); transition: transform .25s ease;
-}
-.post-card:hover .cover img{ transform: scale(1.03); }
-
-.body{ padding: 14px 14px 16px; display:flex; flex-direction:column; gap:10px; }
+.post-head{ display:flex; flex-direction:column; gap:6px; margin-bottom: 8px; }
 .badge-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .badge{
-  font-size:.78rem; font-weight:800; padding:.28rem .6rem; border-radius:999px;
-  border:1px solid transparent;
+  font-size:.78rem; font-weight:800; padding:.28rem .6rem; border-radius:999px; border:1px solid transparent;
 }
 .b-blue { color:#0b3a15; background: linear-gradient(180deg, rgba(25,118,210,.14), rgba(25,118,210,.07)); border-color: rgba(25,118,210,.25); }
 .b-green{ color:#0b3a15; background: linear-gradient(180deg, rgba(46,125,50,.14), rgba(46,125,50,.07)); border-color: rgba(46,125,50,.25); }
 .b-gold { color:#3b2b0a; background: linear-gradient(180deg, rgba(214,179,94,.18), rgba(214,179,94,.08)); border-color: rgba(214,179,94,.28); }
 .b-red  { color:#3b0a0a; background: linear-gradient(180deg, rgba(229,57,53,.16), rgba(229,57,53,.08)); border-color: rgba(229,57,53,.28); }
 
-.meta{ color: var(--muted); font-size:.82rem; }
+.post-title{ margin:.1rem 0 0; font-size:1.08rem; font-weight:900; letter-spacing:.2px; }
 
-.post-title{
-  margin:.2rem 0 .1rem;
-  font-size:1.05rem; font-weight:900; letter-spacing:.2px; color: var(--ink);
+.cover{ margin: 8px 0 10px; border-radius:12px; overflow:hidden; background:#fffdf7; }
+.cover img{ width:100%; height:auto; display:block; }
+
+.post-text p{ margin:0; color:#1f2937; line-height:1.6; }
+
+.gallery-grid{
+  margin-top:10px;
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.gallery-grid img{
+  width:100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius:10px; display:block;
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
 }
 
-.post-excerpt{ margin: .1rem 0 0; color:#1f2937; line-height:1.55; }
-
-.actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 4px; }
-
-/* Butoane card */
+.actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
 .btn{
-  display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none;
-  font-weight:800; transition: transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+  display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:800;
+  transition: transform .12s ease, opacity .12s ease, box-shadow .12s ease;
 }
-.btn-solid{
-  background:#2f8f4f; color:#fff; box-shadow: 0 6px 16px rgba(46,125,50,.22);
-}
-.btn-ghost{
-  background:transparent; color:#2f8f4f; border:2px solid #2f8f4f;
-}
+.btn-solid{ background:#2f8f4f; color:#fff; box-shadow: 0 6px 16px rgba(46,125,50,.22); }
+.btn-ghost{ background:transparent; color:#2f8f4f; border:2px solid #2f8f4f; }
 .btn:hover{ transform: translateY(-1px); opacity:.95; }
 
 /* ===== Responsive ===== */
 @media (max-width: 980px){
-  .blog-wrap{ grid-template-columns:1fr; gap:18px; }
-  .blog-dna{ position: static; }
-  .dna-slim{ width: 120px; margin-top: 0; }
-  .brand-title{ margin-top: 2px; }
-  .blog-dna-nav{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .pill{ width: auto; padding: 10px 16px; }
+  .blog-shell{ grid-template-columns: 1fr; }
+  .blog-sidebar{ position: static; }
+  .dna-slim{ width: 140px; }
 }
 </style>
 
 <script>
-/* Map hash->secțiune și filtrează */
-const FILTER_MAP = {
-  '#all': 'all',
-  '#insta': 'insta',
-  '#articles': 'articles',
-  '#galerie': 'gallery',
-  '#lectii': 'lectii'
-};
+/* === Filtrare pe secțiuni via hash === */
+const FILTER_MAP = {'#all':'all','#insta':'insta','#articles':'articles','#galerie':'gallery','#lectii':'lectii'};
 
 function filterContent(section) {
-  const allPosts = document.querySelectorAll('.post-card');
-  allPosts.forEach(post => {
-    const postSection = post.getAttribute('data-section');
-    post.style.display = (section === 'all' || postSection === section) ? '' : 'none';
+  document.querySelectorAll('.post-card').forEach(post=>{
+    const s = post.getAttribute('data-section');
+    post.style.display = (section==='all'|| s===section)? '':'none';
   });
 }
-
 function highlightActive(section){
-  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
-  const matchHash = Object.keys(FILTER_MAP).find(h => FILTER_MAP[h] === section);
-  if(matchHash){
-    document.querySelectorAll(`.blog-dna-nav a[href$="${matchHash}"], .blog-dna-nav-secondary a[href$="${matchHash}"]`)
-      .forEach(a=>a.classList.add('active'));
+  document.querySelectorAll('.side-link').forEach(a=>a.classList.remove('active'));
+  const hash = Object.keys(FILTER_MAP).find(h => FILTER_MAP[h]===section);
+  if (hash){
+    document.querySelectorAll(`.side-link[href$="${hash}"]`).forEach(a=>a.classList.add('active'));
   }
 }
-
 function applyFromHash(){
-  const h = (location.hash || '').toLowerCase();
-  const section = FILTER_MAP[h] || 'all';
-  filterContent(section);
-  highlightActive(section);
+  const h = (location.hash||'').toLowerCase();
+  const s = FILTER_MAP[h] || 'all';
+  filterContent(s); highlightActive(s);
 }
-
-/* Interceptează click pe pill-uri cu hash */
 document.addEventListener('DOMContentLoaded', ()=>{
-  document.querySelectorAll('.blog-dna-nav a, .blog-dna-nav-secondary a').forEach(a=>{
+  document.querySelectorAll('.side-link').forEach(a=>{
     a.addEventListener('click', (e)=>{
-      const href = a.getAttribute('href') || '';
-      const i = href.indexOf('#');
-      if (i !== -1){
-        e.preventDefault();
-        location.hash = href.substring(i);
-        applyFromHash();
-      }
+      const href=a.getAttribute('href')||''; const i=href.indexOf('#');
+      if(i!==-1){ e.preventDefault(); location.hash=href.substring(i); applyFromHash(); }
     });
   });
-
   applyFromHash();
 });
-
 window.addEventListener('hashchange', applyFromHash);
 
-/* Search după titlu */
+/* === Căutare după titlu (combinată cu filtrul curent) === */
 function searchPosts() {
-  const input = (document.getElementById("searchInput").value || "").toLowerCase();
-  const posts = document.querySelectorAll(".post-card");
-  posts.forEach(post => {
-    const title = (post.getAttribute("data-title") || "").toLowerCase();
-    const match = title.includes(input);
-    // combină căutarea cu filtrul curent
-    const h = (location.hash || '').toLowerCase();
-    const section = FILTER_MAP[h] || 'all';
-    const inSection = (section === 'all' || post.getAttribute('data-section') === section);
-    post.style.display = (match && inSection) ? '' : 'none';
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  const h = (location.hash||'').toLowerCase();
+  const s = FILTER_MAP[h] || 'all';
+  document.querySelectorAll('.post-card').forEach(post=>{
+    const title=(post.getAttribute('data-title')||'').toLowerCase();
+    const inSection=(s==='all' || post.getAttribute('data-section')===s);
+    post.style.display = (title.includes(q) && inSection)? '':'none';
   });
 }
 </script>
-
 {% endblock %}
