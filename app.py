@@ -24,12 +24,16 @@ db_url = os.getenv("DATABASE_URL", "sqlite:///local.db").replace("postgres://", 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Căi ABSOLUTE pentru static & uploads (evită surprize cu CWD)
-STATIC_DIR = os.path.join(app.root_path, "static")
-IMAGES_DIR = os.path.join(STATIC_DIR, "images")
-UPLOADS_DIR = os.path.join(STATIC_DIR, "uploads")
+# CĂI ABSOLUTE (EVITĂ PROBLEME DE CWD)
+STATIC_DIR  = os.path.join(app.root_path, "static")
+IMAGES_DIR  = os.path.join(STATIC_DIR, "images")   # pentru About + assets în repo
+UPLOADS_DIR = os.path.join(STATIC_DIR, "uploads")  # pentru uploaduri din admin
+DATA_DIR    = os.path.join(STATIC_DIR, "data")     # team.json
+
 os.makedirs(IMAGES_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
+
 app.config["UPLOAD_FOLDER"] = UPLOADS_DIR
 
 # Extensii acceptate
@@ -48,9 +52,9 @@ class Post(db.Model):
     section = db.Column(db.String(32), nullable=False)   # 'insta' | 'articles' | 'gallery' | 'lectii'
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, default="")
-    image_url = db.Column(db.String(512))                # cover (poate fi /static/uploads/..., nume simplu sau URL extern)
+    image_url = db.Column(db.String(512))                # stocăm numele fișierului (uploads) sau URL extern
     external_url = db.Column(db.String(512))             # ex: link Instagram / extern
-    ppt_url = db.Column(db.String(512))                  # link prezentare (Google Slides / PPT public)
+    ppt_url = db.Column(db.String(512))                  # link prezentare (Google Slides / PDF)
     author = db.Column(db.String(128), default="Club BIO")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -59,10 +63,7 @@ _tables_ready = False
 
 def _ensure_users():
     """Creează/actualizează cele 2 conturi cerute."""
-    wanted = {
-        "admin@vianubio": "parola123",
-        "membriiaccount": "weluvbio",
-    }
+    wanted = {"admin@vianubio": "parola123", "membriiaccount": "weluvbio"}
     for email, pwd in wanted.items():
         u = User.query.filter_by(email=email).first()
         if not u:
@@ -70,15 +71,11 @@ def _ensure_users():
     db.session.commit()
 
 def _ensure_columns():
-    """
-    Adaugă coloana 'ppt_url' în Post dacă lipsește.
-    Funcționează pentru SQLite și Postgres (ignoră eroarea dacă deja există).
-    """
+    """Adaugă coloana 'ppt_url' în Post dacă lipsește (ignora eroarea dacă există deja)."""
     try:
         with db.engine.begin() as con:
             con.execute(text("ALTER TABLE post ADD COLUMN ppt_url VARCHAR(512);"))
     except Exception:
-        # probabil există deja coloana; ignorăm
         pass
 
 def _init_db_once():
@@ -91,7 +88,6 @@ def _init_db_once():
     _ensure_users()
     _tables_ready = True
 
-# pornire
 with app.app_context():
     try:
         _init_db_once()
@@ -124,61 +120,55 @@ def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def _unique_filename(original_name: str) -> str:
-    """
-    Generează un nume unic prietenos:
-    <uuid8>-<secure_basename>.<ext>
-    """
+    """Generează un nume unic prietenos: <uuid8>-<secure_basename>.<ext>"""
     base = secure_filename(original_name)
     name, ext = os.path.splitext(base)
     uid = uuid.uuid4().hex[:8]
     return f"{uid}-{name}{ext.lower()}"
 
 def _url_for_static(subpath: str) -> str:
-    """Shortcut pentru url_for static (asigură formatarea corectă)."""
     return url_for("static", filename=subpath)
 
-def _resolve_photo_src(name_or_url: str, placeholder_rel: str = "images/placeholder.jpg") -> str:
+def resolve_about_photo(name_or_url: str) -> str:
     """
-    Regula de rezolvare pentru ABOUT (membri):
-      - dacă începe cu http(s), îl folosim direct
-      - altfel, căutăm mai întâi în static/images/<nume>
-      - apoi în static/uploads/<nume>
-      - dacă nu există, placeholder
+    Regula de rezolvare pentru ABOUT (membri) — FOTO din team.json (static/data/team.json):
+      - dacă e http(s) -> URL extern
+      - dacă începe cu /static/ -> folosește-l ca atare
+      - altfel tratează ca nume fișier: caută în static/images/, apoi fallback static/uploads/
+      - dacă nu îl găsește -> static/images/placeholder.jpg
     """
+    placeholder_rel = "images/placeholder.jpg"
     if not name_or_url:
         return _url_for_static(placeholder_rel)
 
     s = name_or_url.strip()
     if s.startswith("http://") or s.startswith("https://"):
         return s
-
-    # Dacă vine deja ca /static/..., îl returnăm ca atare
     if s.startswith("/static/"):
         return s
 
-    # Altfel e doar un nume de fișier -> caută-l în images/ sau uploads/
-    images_path = os.path.join(IMAGES_DIR, s)
-    uploads_path = os.path.join(UPLOADS_DIR, s)
-    if os.path.isfile(images_path):
+    img_path = os.path.join(IMAGES_DIR, s)
+    if os.path.isfile(img_path):
         return _url_for_static(f"images/{s}")
-    if os.path.isfile(uploads_path):
+
+    up_path = os.path.join(UPLOADS_DIR, s)
+    if os.path.isfile(up_path):
         return _url_for_static(f"uploads/{s}")
 
     return _url_for_static(placeholder_rel)
 
-def _resolve_post_cover_src(image_url: str, placeholder_rel: str = "images/placeholder.jpg") -> str:
+def resolve_post_cover(image_url: str) -> str:
     """
-    Regula de rezolvare pentru cover-ul postării:
-      - dacă e URL absolut -> folosește-l
-      - dacă începe cu /static/ -> folosește-l
-      - dacă e doar nume de fișier -> /static/uploads/<nume> (dacă există), altfel placeholder
-      - altfel placeholder
+    Regula pentru cover-ul postării (Blog):
+      - http(s) sau /static/... -> direct
+      - altfel, dacă e nume de fișier în uploads -> /static/uploads/<nume>
+      - altfel -> placeholder
     """
+    placeholder_rel = "images/placeholder.jpg"
     if image_url:
         s = image_url.strip()
         if s.startswith("http://") or s.startswith("https://") or s.startswith("/static/"):
             return s
-        # doar nume fișier
         up = os.path.join(UPLOADS_DIR, s)
         if os.path.isfile(up):
             return _url_for_static(f"uploads/{s}")
@@ -205,7 +195,7 @@ def blog():
 
     # atașează cover_src pentru template (imaginea postării)
     for p in posts:
-        p.cover_src = _resolve_post_cover_src(p.image_url)
+        p.cover_src = resolve_post_cover(p.image_url)
 
     return render_template("blog.html", posts=posts, can_view_lessons=can_view_lessons())
 
@@ -213,32 +203,23 @@ def blog():
 @app.get("/about", endpoint="about")
 def about():
     """
-    Citește echipa din:
-      1) static/data/team.json (default)
-      2) fallback: content/team.json (dacă vrei să muți acolo)
+    Citește echipa din static/data/tea m.json (conform cerinței).
     Pentru fiecare membru setează m['photo_src'] cu regulile robuste.
     """
     import json
 
     team = []
-    candidates = [
-        os.path.join(STATIC_DIR, "data", "team.json"),
-        os.path.join(app.root_path, "content", "team.json"),
-    ]
-    data_path = next((p for p in candidates if os.path.exists(p)), None)
-
-    if data_path:
+    data_path = os.path.join(DATA_DIR, "team.json")  # <<< static/data/team.json
+    if os.path.exists(data_path):
         try:
             with open(data_path, "r", encoding="utf-8") as f:
                 team = json.load(f)
         except Exception as e:
             print("Eroare la citirea team.json:", e)
-            team = []
 
-    # rezolvă sursa de imagine pentru fiecare membru
     for m in team:
         photo = (m.get("photo") or "").strip()
-        m["photo_src"] = _resolve_photo_src(photo)
+        m["photo_src"] = resolve_about_photo(photo)
 
     return render_template("about.html", team=team)
 
@@ -250,26 +231,30 @@ def api_posts():
         q = q.filter(Post.section != "lectii")
     posts = q.order_by(Post.created_at.desc()).all()
 
-    # includem cover_src calculat
     payload = []
     for p in posts:
         payload.append(dict(
             id=p.id, section=p.section, title=p.title, content=p.content,
             image_url=p.image_url, external_url=p.external_url, ppt_url=p.ppt_url,
             author=p.author, created_at=p.created_at.isoformat(),
-            cover_src=_resolve_post_cover_src(p.image_url),
+            cover_src=resolve_post_cover(p.image_url),
         ))
     return jsonify(payload)
 
 @app.get("/health")
 def health():
-    # mic sanity check pentru assets
     return {
         "ok": True,
-        "static_images_exists": os.path.isdir(IMAGES_DIR),
-        "static_uploads_exists": os.path.isdir(UPLOADS_DIR),
-        "images_count": len(os.listdir(IMAGES_DIR)) if os.path.isdir(IMAGES_DIR) else 0,
-        "uploads_count": len(os.listdir(UPLOADS_DIR)) if os.path.isdir(UPLOADS_DIR) else 0,
+        "root": app.root_path,
+        "static_dir": STATIC_DIR,
+        "images_dir": IMAGES_DIR,
+        "uploads_dir": UPLOADS_DIR,
+        "data_dir": DATA_DIR,
+        "images_present": sorted(os.listdir(IMAGES_DIR)) if os.path.isdir(IMAGES_DIR) else [],
+        "uploads_present": sorted(os.listdir(UPLOADS_DIR)) if os.path.isdir(UPLOADS_DIR) else [],
+        "team_json_exists": os.path.isfile(os.path.join(DATA_DIR, "team.json")),
+        "static_placeholder_exists": os.path.isfile(os.path.join(IMAGES_DIR, "placeholder.jpg")),
+        "static_route_example": url_for("static", filename="images/placeholder.jpg")
     }
 
 # -------------------- AUTH --------------------
@@ -325,7 +310,7 @@ def admin_new_post():
             fname = _unique_filename(f.filename)
             save_path = os.path.join(app.config["UPLOAD_FOLDER"], fname)
             f.save(save_path)
-            # stocăm doar numele (mai flexibil), nu URL-ul complet
+            # stocăm DOAR numele (mai flexibil); pentru afișare folosim resolve_post_cover()
             image_url = fname
         else:
             flash("Format imagine neacceptat (folosește png/jpg/jpeg/gif/webp/svg).", "error")
@@ -333,8 +318,7 @@ def admin_new_post():
     p = Post(
         section=section, title=title, content=content,
         image_url=image_url, external_url=external_url,
-        ppt_url=ppt_url,
-        author=author
+        ppt_url=ppt_url, author=author
     )
     db.session.add(p)
     db.session.commit()
