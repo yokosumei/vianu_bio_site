@@ -19,7 +19,7 @@
       <figure class="member">
         <div class="member-frame">
           <img
-            src="{{ url_for('static', filename='images/' ~ (m.photo if m.photo_exists else 'placeholder.jpg')) }}?v={{ loop.index }}"
+            src="{{ url_for('static', filename=m.photo) }}?v={{ loop.index }}"
             alt="{{ m.name }}"
             loading="lazy"
             onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
@@ -45,8 +45,6 @@
   --ink: #2a2a2a;
   --ring:  32,129,80;
 }
-
-/* fundal cald */
 .fancy-bg{
   position: relative;
   background:
@@ -54,8 +52,6 @@
     radial-gradient(1000px 280px at 88% -10%, rgba(121, 173, 110, .18), transparent 60%),
     linear-gradient(180deg, var(--page-bg), var(--page-bg-accent) 65%);
 }
-
-/* intro – card premium */
 .about-intro.pro{
   max-width: 980px; margin: 0 auto 22px; padding: 16px 18px;
   line-height: 1.7; color: #2b2b2b;
@@ -73,8 +69,6 @@
   padding: 0 .25rem; border-radius: .35rem;
 }
 .about-intro.pro strong{ color: #0f3f16; font-weight: 800; }
-
-/* titlu cu underline animat */
 .about-title{
   text-align: center; margin: 14px 0 22px; letter-spacing: .5px;
 }
@@ -89,8 +83,6 @@
   transition: transform .45s cubic-bezier(.2,.7,0,1);
 }
 .about-title span:hover::after{ transform: scaleX(1); }
-
-/* grid echipă */
 .team-grid{
   width: min(1100px, 92%); margin: 0 auto;
   display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -120,8 +112,6 @@
   background: linear-gradient(180deg, rgba(46,125,50,.12), rgba(46,125,50,.06));
   border:1px solid rgba(46,125,50,.25); padding:.28rem .6rem; border-radius:999px;
 }
-
-/* responsive */
 @media (max-width: 600px){
   .team-grid{ gap: 18px; }
   .member{ padding: 12px; }
