@@ -3,10 +3,11 @@
 
 {% block content %}
 <section class="about fancy-bg">
-  <p class="about-intro">
-    Vianu Biologists este mai mult decât un simplu club de liceeni: este locul unde curiozitatea prinde rădăcini
-    și înflorește la fiecare întâlnire. Discutăm teme din botanică, anatomie și histologie, îmbinând materia de clasă
-    cu experimente, machete și discuții care schimbă perspectiva asupra biologiei.
+  <p class="about-intro pro">
+    <span class="lead">Vianu Biologists</span> este mai mult decât un simplu club de liceeni:
+    este locul unde <em>curiozitatea prinde rădăcini</em> și înflorește la fiecare întâlnire.
+    Discutăm teme din <strong>botanică</strong>, <strong>anatomie</strong> și <strong>histologie</strong>,
+    îmbinând materia de clasă cu experimente, machete și discuții care schimbă perspectiva asupra biologiei.
   </p>
 
   <h1 class="about-title"><span>Echipa</span></h1>
@@ -18,7 +19,7 @@
       <figure class="member">
         <div class="member-frame">
           <img
-            src="{{ url_for('static', filename='images/' ~ (m.photo or 'placeholder.jpg')) }}"
+            src="{{ url_for('static', filename='images/' ~ (m.photo if m.photo_exists else 'placeholder.jpg')) }}?v={{ loop.index }}"
             alt="{{ m.name }}"
             loading="lazy"
             onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
@@ -38,169 +39,89 @@
 </section>
 
 <style>
-/* ====== Theme tokens ====== */
 :root{
-  --bg: #f7faf8;
-  --card: #ffffff;
-  --ink: #0f172a;
-  --muted: #6b7280;
-  --brand-1: #2e7d32;    /* verde */
-  --brand-2: #1976d2;    /* albastru */
-  --brand-3: #e53935;    /* roșu */
-  --ring:  32, 129, 80;  /* verde as RGBA for glows */
+  --page-bg: #f6f1e6;
+  --page-bg-accent: #f1eadb;
+  --ink: #2a2a2a;
+  --ring:  32,129,80;
 }
 
-/* ====== Section ====== */
-.about{
-  padding: 28px 0 48px;
-  color: var(--ink);
-}
+/* fundal cald */
 .fancy-bg{
   position: relative;
   background:
-    radial-gradient(1200px 300px at 10% -20%, rgba(46,125,50,.15), transparent 60%),
-    radial-gradient(900px 300px at 90% -10%, rgba(25,118,210,.10), transparent 60%),
-    linear-gradient(180deg, var(--bg), #fff 60%);
-  overflow: hidden;
+    radial-gradient(1200px 300px at 12% -15%, rgba(233, 210, 160, .25), transparent 60%),
+    radial-gradient(1000px 280px at 88% -10%, rgba(121, 173, 110, .18), transparent 60%),
+    linear-gradient(180deg, var(--page-bg), var(--page-bg-accent) 65%);
 }
 
-/* subtitlu intro */
-.about-intro{
-  max-width: 900px;
-  margin: 0 auto 18px;
-  padding: 10px 18px;
-  line-height: 1.6;
-  color: #1f2937;
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(16,185,129,.08);
-  border-radius: 14px;
-  backdrop-filter: blur(4px);
+/* intro – card premium */
+.about-intro.pro{
+  max-width: 980px; margin: 0 auto 22px; padding: 16px 18px;
+  line-height: 1.7; color: #2b2b2b;
+  background: linear-gradient(180deg, #fffdf7, #faf3e6);
+  border: 1px solid rgba(181, 142, 60, .22); border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.06);
 }
+.about-intro.pro .lead{
+  font-weight: 900; letter-spacing: .3px;
+  background: linear-gradient(90deg, #d6b35e, #79b85f 55%, #5aa8ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.about-intro.pro em{
+  background: linear-gradient(120deg, rgba(121, 184, 95, .22), rgba(214, 179, 94, .18));
+  padding: 0 .25rem; border-radius: .35rem;
+}
+.about-intro.pro strong{ color: #0f3f16; font-weight: 800; }
 
-/* titlul cu underline animat */
+/* titlu cu underline animat */
 .about-title{
-  text-align: center;
-  margin: 14px 0 22px;
-  letter-spacing: .5px;
+  text-align: center; margin: 14px 0 22px; letter-spacing: .5px;
 }
 .about-title span{
-  display: inline-block;
-  font-weight: 900;
-  font-size: clamp(24px, 3.4vw, 34px);
-  color: #114411;
-  position: relative;
-  padding: 2px 4px;
+  display:inline-block; font-weight: 900; font-size: clamp(24px, 3.4vw, 34px);
+  color: #114411; position: relative; padding: 2px 4px;
 }
 .about-title span::after{
-  content:"";
-  position: absolute;
-  left: 0; right: 0; bottom: -6px;
-  height: 6px;
-  background: linear-gradient(90deg, #2e7d32, #1976d2, #e53935);
-  border-radius: 999px;
-  transform: scaleX(.2);
-  transform-origin: left;
+  content:""; position:absolute; left:0; right:0; bottom:-6px; height:6px;
+  background: linear-gradient(90deg, #d6b35e, #79b85f, #5aa8ff);
+  border-radius: 999px; transform: scaleX(.25); transform-origin: left;
   transition: transform .45s cubic-bezier(.2,.7,0,1);
 }
 .about-title span:hover::after{ transform: scaleX(1); }
 
-/* ====== Grid ====== */
+/* grid echipă */
 .team-grid{
-  width: min(1100px, 92%);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 24px;
-  align-items: stretch;
+  width: min(1100px, 92%); margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 24px; align-items: stretch;
 }
-
-/* ====== Card membru ====== */
 .member{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-  margin: 0;
-  background: var(--card);
-  border-radius: 16px;
-  border: 1px solid rgba(15,23,42,.06);
-  position: relative;
-  isolation: isolate;
+  display:flex; flex-direction:column; gap:12px; padding:14px; margin:0;
+  background:#fff; border-radius:16px; border:1px solid rgba(15,23,42,.06);
+  position:relative; box-shadow:0 8px 26px rgba(0,0,0,.06);
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  box-shadow: 0 8px 26px rgba(0,0,0,.06);
 }
-
-/* border gradient subtil */
-.member::before{
-  content:"";
-  position:absolute; inset: -1px;
-  border-radius: 17px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(46,125,50,.25), rgba(25,118,210,.2) 60%, rgba(229,57,53,.2));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  opacity: .0; transition: opacity .25s ease;
-}
-.member:hover::before{ opacity: .8; }
-
 .member:hover{
-  transform: translateY(-4px);
-  box-shadow:
-    0 14px 34px rgba(0,0,0,.10),
-    0 0 0 8px rgba(var(--ring), .05);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.10), 0 0 0 8px rgba(var(--ring), .05);
   border-color: rgba(15,23,42,.12);
 }
-
-/* frame imagine cu “glow” și crop pătrat */
-.member-frame{
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-}
-.member-frame::after{
-  content:"";
-  position:absolute; inset: 0;
-  background: radial-gradient(180px 120px at 80% 20%, rgba(25,118,210,.15), transparent 60%);
-  opacity: .0; transition: opacity .25s ease;
-}
-.member:hover .member-frame::after{ opacity: 1; }
-
+.member-frame{ position:relative; border-radius:14px; overflow:hidden; }
 .member img{
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  display: block;
-  transform: scale(1);
-  transition: transform .25s ease;
+  width:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+  transform: scale(1); transition: transform .25s ease;
 }
 .member:hover img{ transform: scale(1.03); }
-
-/* caption: nume + rol badge */
-.member-caption{
-  display: grid;
-  gap: 6px;
-  justify-items: center;
-  text-align: center;
-}
-.member-name{
-  font-weight: 800;
-  font-size: 1.02rem;
-  letter-spacing: .2px;
-  color: #0f172a;
-}
+.member-caption{ display:grid; gap:6px; justify-items:center; text-align:center; }
+.member-name{ font-weight:800; font-size:1.02rem; letter-spacing:.2px; color:#0f172a; }
 .member-role{
-  display:inline-block;
-  font-size: .85rem;
-  font-weight: 700;
-  color: #0b3a15;
+  display:inline-block; font-size:.85rem; font-weight:700; color:#0b3a15;
   background: linear-gradient(180deg, rgba(46,125,50,.12), rgba(46,125,50,.06));
-  border: 1px solid rgba(46,125,50,.25);
-  padding: .28rem .6rem;
-  border-radius: 999px;
-  backdrop-filter: blur(2px);
+  border:1px solid rgba(46,125,50,.25); padding:.28rem .6rem; border-radius:999px;
 }
 
-/* responsive mici ajustări */
+/* responsive */
 @media (max-width: 600px){
   .team-grid{ gap: 18px; }
   .member{ padding: 12px; }
